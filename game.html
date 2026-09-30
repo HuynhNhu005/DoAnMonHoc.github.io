@@ -1,0 +1,1093 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Piko Game - Trung Tâm Giải Trí Rực Rỡ</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800;900&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      * {
+        box-sizing: border-box;
+        user-select: none;
+      }
+
+      body {
+        font-family: "Outfit", sans-serif;
+        background: #0d0b21;
+        min-height: 100vh;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+        position: relative;
+      }
+
+      /* HIỆU ỨNG NỀN ĐỘNG CỰC ĐẸP */
+      .bg-glow {
+        position: absolute;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+        z-index: 0;
+      }
+      .circle-glow {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(80px);
+        opacity: 0.55;
+        animation: floatGlow 10s infinite alternate ease-in-out;
+      }
+      .glow-1 {
+        width: 350px;
+        height: 350px;
+        background: #7928ca;
+        top: -50px;
+        left: -50px;
+      }
+      .glow-2 {
+        width: 400px;
+        height: 400px;
+        background: #ff0080;
+        bottom: -80px;
+        right: -80px;
+        animation-delay: -5s;
+      }
+      .glow-3 {
+        width: 300px;
+        height: 300px;
+        background: #00dfd8;
+        top: 40%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        animation-delay: -2s;
+      }
+
+      @keyframes floatGlow {
+        0% {
+          transform: scale(1) translate(0, 0);
+        }
+        100% {
+          transform: scale(1.2) translate(30px, -20px);
+        }
+      }
+
+      .screen {
+        display: none;
+        width: 100%;
+        z-index: 10;
+      }
+      .screen.active {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      /* KHUNG THIẾT KẾ GLASSMORPHISM */
+      .game-container {
+        background: rgba(22, 20, 48, 0.7);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 28px;
+        padding: 20px 24px;
+        box-shadow:
+          0 30px 60px rgba(0, 0, 0, 0.5),
+          inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        text-align: center;
+        max-width: 440px;
+        width: 92%;
+        position: relative;
+      }
+
+      .main-title {
+        font-size: 26px;
+        font-weight: 900;
+        background: linear-gradient(135deg, #fff 20%, #a5b4fc 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin: 0 0 4px 0;
+        letter-spacing: 0.5px;
+      }
+
+      .sub-title {
+        color: #94a3b8;
+        font-size: 13px;
+        margin-bottom: 18px;
+      }
+
+      .section-label {
+        font-size: 13px;
+        font-weight: 700;
+        color: #e2e8f0;
+        margin: 14px 0 8px 0;
+        text-align: left;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      /* LỰA CHỌN NHÂN VẬT PIKO */
+      .piko-select-grid {
+        display: flex;
+        gap: 12px;
+        justify-content: space-between;
+        margin-bottom: 16px;
+      }
+
+      .piko-card {
+        flex: 1;
+        background: rgba(255, 255, 255, 0.05);
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        border-radius: 18px;
+        padding: 10px 6px;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        text-align: center;
+      }
+
+      .piko-card img {
+        width: 52px;
+        height: 52px;
+        object-fit: cover;
+        border-radius: 14px;
+        filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+        transition: transform 0.3s;
+      }
+
+      .piko-card span {
+        display: block;
+        font-size: 12px;
+        font-weight: 700;
+        margin-top: 6px;
+        color: #cbd5e1;
+      }
+
+      .piko-card:hover {
+        transform: translateY(-4px);
+        background: rgba(255, 255, 255, 0.1);
+      }
+
+      .piko-card.selected {
+        border-color: #ff0080;
+        background: rgba(255, 0, 128, 0.15);
+        box-shadow: 0 0 20px rgba(255, 0, 128, 0.4);
+      }
+      .piko-card.selected img {
+        transform: scale(1.1);
+      }
+
+      /* LỰA CHỌN CHẾ ĐỘ GAME */
+      .game-options-grid {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 22px;
+      }
+
+      .game-card-item {
+        flex: 1;
+        background: rgba(255, 255, 255, 0.04);
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 14px 10px;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        text-align: center;
+      }
+
+      .game-card-item i {
+        font-size: 32px;
+        margin-bottom: 8px;
+        display: inline-block;
+        transition: transform 0.3s;
+      }
+
+      .game-card-item:nth-child(1) i {
+        color: #38bdf8;
+      }
+      .game-card-item:nth-child(2) i {
+        color: #4ade80;
+      }
+
+      .game-card-item h4 {
+        margin: 0 0 4px 0;
+        font-size: 14px;
+        color: #f8fafc;
+      }
+
+      .game-card-item p {
+        margin: 0;
+        font-size: 10px;
+        color: #94a3b8;
+      }
+
+      .game-card-item:hover,
+      .game-card-item.selected {
+        transform: translateY(-4px);
+        border-color: #38bdf8;
+        background: rgba(56, 189, 248, 0.12);
+        box-shadow: 0 0 22px rgba(56, 189, 248, 0.3);
+      }
+
+      /* NÚT BẤM HIỆN ĐẠI */
+      .btn-primary {
+        background: linear-gradient(135deg, #ff0080, #7928ca);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 14px;
+        border: none;
+        font-weight: 800;
+        font-size: 14px;
+        cursor: pointer;
+        box-shadow: 0 8px 20px rgba(255, 0, 128, 0.35);
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 25px rgba(255, 0, 128, 0.5);
+      }
+
+      .btn-nav {
+        background: rgba(255, 255, 255, 0.1);
+        color: #e2e8f0;
+        text-decoration: none;
+        padding: 12px 20px;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        font-weight: 700;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .btn-nav:hover {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+      }
+
+      /* CANVAS GAME */
+      .canvas-wrapper {
+        position: relative;
+        margin: 10px auto;
+        width: 350px;
+        height: 330px;
+        border-radius: 22px;
+        overflow: hidden;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+        touch-action: none;
+        cursor: crosshair;
+      }
+
+      canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+
+      .game-status-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-weight: 800;
+        font-size: 15px;
+        color: white;
+        margin-bottom: 6px;
+      }
+
+      .badge-score {
+        background: linear-gradient(135deg, #00f2fe, #4facfe);
+        color: #000;
+        padding: 4px 14px;
+        border-radius: 20px;
+        font-size: 13px;
+        box-shadow: 0 0 10px rgba(79, 172, 254, 0.5);
+      }
+
+      /* NÚT ĐIỀU HƯỚNG 4 HƯỚNG */
+      .dpad-container {
+        display: grid;
+        grid-template-columns: repeat(3, 46px);
+        grid-template-rows: repeat(2, 40px);
+        gap: 6px;
+        justify-content: center;
+        margin-top: 10px;
+      }
+
+      .ctrl-btn {
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.25);
+        color: white;
+        font-size: 16px;
+        font-weight: 800;
+        border-radius: 12px;
+        cursor: pointer;
+        backdrop-filter: blur(10px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.1s;
+      }
+
+      .ctrl-btn:active {
+        transform: scale(0.9);
+        background: rgba(255, 0, 128, 0.4);
+      }
+
+      .jump-btn {
+        background: linear-gradient(135deg, #00c6ff, #0072ff);
+        border: none;
+        width: 100%;
+        padding: 14px 0;
+        font-size: 17px;
+        box-shadow: 0 6px 20px rgba(0, 114, 255, 0.4);
+        margin-top: 10px;
+      }
+
+      .hint-text {
+        font-size: 11px;
+        color: #a5b4fc;
+        margin-top: 4px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ĐÈN CHUYỂN ĐỘNG NỀN -->
+    <div class="bg-glow">
+      <div class="circle-glow glow-1"></div>
+      <div class="circle-glow glow-2"></div>
+      <div class="circle-glow glow-3"></div>
+    </div>
+
+    <!-- MÀN HÌNH CHỌN GAME VÀ NHÂN VẬT -->
+    <div id="game-select-screen" class="screen active">
+      <div class="game-container">
+        <h1 class="main-title">🎮 PIKO ARCADE</h1>
+        <div class="sub-title">
+          Chọn nhân vật đồng hành & thử thách trò chơi
+        </div>
+
+        <div class="section-label">
+          <i class="fa-solid fa-user-ninja" style="color: #ff0080"></i> 1. Chọn
+          nhân vật Piko:
+        </div>
+        <div class="piko-select-grid">
+          <div class="piko-card selected" onclick="selectPiko('cot-nha', this)">
+            <img
+              src="images/mascot-funny.png"
+              onerror="
+                this.src = 'https://api.dicebear.com/7.x/bottts/svg?seed=Funny'
+              "
+            />
+            <span>Cợt Nhã</span>
+          </div>
+          <div class="piko-card" onclick="selectPiko('coc-can', this)">
+            <img
+              src="images/mascot-angry.png"
+              onerror="
+                this.src = 'https://api.dicebear.com/7.x/bottts/svg?seed=Angry'
+              "
+            />
+            <span>Cọc Cằn</span>
+          </div>
+          <div class="piko-card" onclick="selectPiko('de-thuong', this)">
+            <img
+              src="images/mascot-cute.jpg"
+              onerror="
+                this.src = 'https://api.dicebear.com/7.x/bottts/svg?seed=Cute'
+              "
+            />
+            <span>Dễ Thương</span>
+          </div>
+        </div>
+
+        <div class="section-label">
+          <i class="fa-solid fa-gamepad" style="color: #38bdf8"></i> 2. Chọn trò
+          chơi:
+        </div>
+        <div class="game-options-grid">
+          <div class="game-card-item" onclick="selectGame(1, this)">
+            <i class="fa-solid fa-rocket"></i>
+            <h4>Vũ Trụ Né Bom</h4>
+            <p>Né bom & thiên thạch</p>
+          </div>
+
+          <div class="game-card-item" onclick="selectGame(2, this)">
+            <i class="fa-solid fa-person-running"></i>
+            <h4>Piko Chạy Vượt Rào</h4>
+            <p>Chạy vô tận & nhảy né rào</p>
+          </div>
+        </div>
+
+        <div
+          style="
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 10px;
+          "
+        >
+          <button class="btn-primary" onclick="startGame()">
+            <i class="fa-solid fa-play"></i> Bắt Đầu Chơi
+          </button>
+          <a href="chat.html" class="btn-nav"
+            ><i class="fa-solid fa-comments"></i> Chat</a
+          >
+        </div>
+      </div>
+    </div>
+
+    <!-- GAME 1: VŨ TRỤ NÉ BOM -->
+    <div id="game-1-screen" class="screen">
+      <div class="game-container">
+        <div class="game-status-bar">
+          <span>🚀 Né Bom Vũ Trụ</span>
+          <span class="badge-score">Điểm: <span id="g1-score">0</span></span>
+        </div>
+
+        <div class="canvas-wrapper" id="canvas1-wrapper">
+          <canvas id="canvas-game1" width="350" height="330"></canvas>
+        </div>
+        <div class="hint-text">
+          👉 Trượt tay/Rê chuột trên khung game hoặc dùng nút bấm dưới để di
+          chuyển
+        </div>
+
+        <!-- CỤM NÚT ĐIỀU HƯỚNG 4 HƯỚNG -->
+        <div class="dpad-container">
+          <div></div>
+          <button
+            class="ctrl-btn"
+            onmousedown="g1Up = true"
+            onmouseup="g1Up = false"
+            onmouseleave="g1Up = false"
+            ontouchstart="g1Up=true"
+            ontouchend="g1Up=false"
+          >
+            ▲
+          </button>
+          <div></div>
+          <button
+            class="ctrl-btn"
+            onmousedown="g1Left = true"
+            onmouseup="g1Left = false"
+            onmouseleave="g1Left = false"
+            ontouchstart="g1Left=true"
+            ontouchend="g1Left=false"
+          >
+            ◀
+          </button>
+          <button
+            class="ctrl-btn"
+            onmousedown="g1Down = true"
+            onmouseup="g1Down = false"
+            onmouseleave="g1Down = false"
+            ontouchstart="g1Down=true"
+            ontouchend="g1Down=false"
+          >
+            ▼
+          </button>
+          <button
+            class="ctrl-btn"
+            onmousedown="g1Right = true"
+            onmouseup="g1Right = false"
+            onmouseleave="g1Right = false"
+            ontouchstart="g1Right=true"
+            ontouchend="g1Right=false"
+          >
+            ▶
+          </button>
+        </div>
+
+        <div
+          style="
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 12px;
+          "
+        >
+          <button class="btn-primary" onclick="initGame1()">
+            <i class="fa-solid fa-rotate-right"></i> Chơi Lại
+          </button>
+          <button class="btn-nav" onclick="showScreen('game-select-screen')">
+            <i class="fa-solid fa-list"></i> Đổi Game
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- GAME 2: PIKO CHẠY VƯỢT CHƯỚNG NGẠI VẬT -->
+    <div id="game-2-screen" class="screen">
+      <div class="game-container">
+        <div class="game-status-bar">
+          <span>🏃 Piko Vượt Chướng Ngại</span>
+          <span
+            class="badge-score"
+            style="
+              background: linear-gradient(135deg, #11998e, #38ef7d);
+              color: #000;
+            "
+            >Điểm: <span id="g2-score">0</span></span
+          >
+          <span id="g2-lives" style="font-size: 16px">❤️❤️❤️</span>
+        </div>
+
+        <div class="canvas-wrapper">
+          <canvas id="canvas-game2" width="350" height="330"></canvas>
+        </div>
+
+        <button class="ctrl-btn jump-btn" onclick="triggerG2Jump()">
+          🦘 NHẢY NÉ (SPACE / ⬆)
+        </button>
+
+        <div
+          style="
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 12px;
+          "
+        >
+          <button class="btn-primary" onclick="initGame2()">
+            <i class="fa-solid fa-rotate-right"></i> Chơi Lại
+          </button>
+          <button class="btn-nav" onclick="showScreen('game-select-screen')">
+            <i class="fa-solid fa-list"></i> Đổi Game
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const processedPikoImages = {};
+
+      function loadAndCleanImage(key, srcPath) {
+        const img = new Image();
+        img.crossOrigin = "Anonymous";
+        img.onload = () => {
+          try {
+            const canvas = document.createElement("canvas");
+            canvas.width = img.naturalWidth || img.width;
+            canvas.height = img.naturalHeight || img.height;
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0);
+
+            const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imgData.data;
+
+            for (let i = 0; i < data.length; i += 4) {
+              if (data[i] > 210 && data[i + 1] > 210 && data[i + 2] > 210) {
+                data[i + 3] = 0;
+              }
+            }
+
+            ctx.putImageData(imgData, 0, 0);
+            const cleanImg = new Image();
+            cleanImg.src = canvas.toDataURL();
+            processedPikoImages[key] = cleanImg;
+          } catch (e) {
+            processedPikoImages[key] = img;
+          }
+        };
+
+        img.onerror = () => {
+          const fallback = new Image();
+          fallback.src = "https://api.dicebear.com/7.x/bottts/svg?seed=" + key;
+          fallback.onload = () => (processedPikoImages[key] = fallback);
+        };
+
+        img.src = srcPath;
+      }
+
+      loadAndCleanImage("cot-nha", "images/mascot-funny.png");
+      loadAndCleanImage("coc-can", "images/mascot-angry.png");
+      loadAndCleanImage("de-thuong", "images/mascot-cute.jpg");
+
+      let selectedPikoType = "cot-nha";
+      let activeGameId = null;
+      let loop1 = null,
+        loop2 = null;
+
+      function selectPiko(type, element) {
+        selectedPikoType = type;
+        document
+          .querySelectorAll(".piko-card")
+          .forEach((c) => c.classList.remove("selected"));
+        element.classList.add("selected");
+      }
+
+      function selectGame(id, element) {
+        activeGameId = id;
+        document
+          .querySelectorAll(".game-card-item")
+          .forEach((c) => c.classList.remove("selected"));
+        element.classList.add("selected");
+      }
+
+      function showScreen(id) {
+        document
+          .querySelectorAll(".screen")
+          .forEach((s) => s.classList.remove("active"));
+        document.getElementById(id).classList.add("active");
+
+        if (loop1) cancelAnimationFrame(loop1);
+        if (loop2) cancelAnimationFrame(loop2);
+
+        if (id === "game-1-screen") initGame1();
+        if (id === "game-2-screen") initGame2();
+      }
+
+      function startGame() {
+        if (!activeGameId) return alert("Vui lòng chọn 1 trò chơi trước!");
+        showScreen(activeGameId === 1 ? "game-1-screen" : "game-2-screen");
+      }
+
+      // ========================================================
+      // LOGIC GAME 1: VŨ TRỤ NÉ BOM (ĐIỀU KHIỂN 4 HƯỚNG & TOUCH/DRAG)
+      // ========================================================
+      let g1Left = false,
+        g1Right = false,
+        g1Up = false,
+        g1Down = false,
+        g1Keys = {};
+      let g1Score = 0,
+        g1Over = false;
+      let g1Player = { x: 150, y: 240, w: 50, h: 50, speed: 7 };
+      let g1Obstacles = [];
+      let spaceStars = [];
+
+      for (let i = 0; i < 50; i++) {
+        spaceStars.push({
+          x: Math.random() * 350,
+          y: Math.random() * 330,
+          size: Math.random() * 2 + 0.8,
+          speed: Math.random() * 1.5 + 0.5,
+        });
+      }
+
+      // ĐIỀU KHIỂN BẰNG TOUCH / MOUSE TRỰC TIẾP TRÊN CANVAS
+      const cv1 = document.getElementById("canvas-game1");
+
+      function handlePointerMove(e) {
+        if (
+          g1Over ||
+          document
+            .getElementById("game-1-screen")
+            .classList.contains("active") === false
+        )
+          return;
+        const rect = cv1.getBoundingClientRect();
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+        if (
+          clientX >= rect.left &&
+          clientX <= rect.right &&
+          clientY >= rect.top &&
+          clientY <= rect.bottom
+        ) {
+          const targetX = clientX - rect.left - g1Player.w / 2;
+          const targetY = clientY - rect.top - g1Player.h / 2;
+
+          g1Player.x = Math.max(0, Math.min(cv1.width - g1Player.w, targetX));
+          g1Player.y = Math.max(0, Math.min(cv1.height - g1Player.h, targetY));
+        }
+      }
+
+      cv1.addEventListener("mousemove", (e) => {
+        if (e.buttons === 1) handlePointerMove(e);
+      });
+      cv1.addEventListener("touchstart", handlePointerMove, { passive: true });
+      cv1.addEventListener("touchmove", handlePointerMove, { passive: true });
+
+      function initGame1() {
+        const ctx = cv1.getContext("2d");
+        g1Score = 0;
+        g1Over = false;
+        g1Obstacles = [];
+        g1Player.x = 150;
+        g1Player.y = 240;
+        let frameCount = 0;
+
+        function update() {
+          if (g1Over) return;
+
+          // Xử lý di chuyển bằng nút/bàn phím 4 hướng
+          if (
+            (g1Left || g1Keys["ArrowLeft"] || g1Keys["KeyA"]) &&
+            g1Player.x > 0
+          )
+            g1Player.x -= g1Player.speed;
+          if (
+            (g1Right || g1Keys["ArrowRight"] || g1Keys["KeyD"]) &&
+            g1Player.x < cv1.width - g1Player.w
+          )
+            g1Player.x += g1Player.speed;
+          if ((g1Up || g1Keys["ArrowUp"] || g1Keys["KeyW"]) && g1Player.y > 0)
+            g1Player.y -= g1Player.speed;
+          if (
+            (g1Down || g1Keys["ArrowDown"] || g1Keys["KeyS"]) &&
+            g1Player.y < cv1.height - g1Player.h
+          )
+            g1Player.y += g1Player.speed;
+
+          frameCount++;
+
+          // Tạo bom/thiên thạch
+          if (frameCount % 16 === 0) {
+            let spawnX = Math.random() * (cv1.width - 32);
+            // Né vị trí xuất phát Piko ở vài giây đầu
+            if (frameCount < 90 && Math.abs(spawnX - g1Player.x) < 60) {
+              spawnX = (spawnX + 120) % (cv1.width - 32);
+            }
+
+            g1Obstacles.push({
+              x: spawnX,
+              y: -35,
+              size: 28,
+              speed: 3.5 + Math.random() * 3.5,
+              icon: Math.random() > 0.4 ? "💣" : "☄️",
+            });
+          }
+
+          for (let i = g1Obstacles.length - 1; i >= 0; i--) {
+            let obs = g1Obstacles[i];
+            obs.y += obs.speed;
+
+            // Va chạm va chạm chính xác hơn
+            if (
+              g1Player.x < obs.x + obs.size - 6 &&
+              g1Player.x + g1Player.w > obs.x + 6 &&
+              g1Player.y < obs.y + obs.size - 6 &&
+              g1Player.y + g1Player.h > obs.y + 6
+            ) {
+              g1Over = true;
+            }
+
+            if (obs.y > cv1.height) {
+              g1Obstacles.splice(i, 1);
+              g1Score += 10;
+            }
+          }
+
+          // VẼ NỀN SPACE DEEP NEON
+          let grad = ctx.createLinearGradient(0, 0, 0, cv1.height);
+          grad.addColorStop(0, "#0a0a1a");
+          grad.addColorStop(0.5, "#121236");
+          grad.addColorStop(1, "#1a0b2e");
+          ctx.fillStyle = grad;
+          ctx.fillRect(0, 0, cv1.width, cv1.height);
+
+          // VẼ SAO TRÔI
+          spaceStars.forEach((s) => {
+            s.y += s.speed;
+            if (s.y > cv1.height) s.y = 0;
+            ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+            ctx.beginPath();
+            ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+            ctx.fill();
+          });
+
+          // VẼ PIKO
+          let activeImg = processedPikoImages[selectedPikoType];
+          if (activeImg && activeImg.complete && activeImg.naturalWidth !== 0) {
+            ctx.save();
+            ctx.shadowColor = "#00f2fe";
+            ctx.shadowBlur = 15;
+            ctx.drawImage(
+              activeImg,
+              g1Player.x,
+              g1Player.y,
+              g1Player.w,
+              g1Player.h,
+            );
+            ctx.restore();
+          }
+
+          // VẼ BOM/THIÊN THẠCH
+          g1Obstacles.forEach((obs) => {
+            ctx.save();
+            ctx.shadowColor = "#ff0080";
+            ctx.shadowBlur = 12;
+            ctx.font = `${obs.size}px Arial`;
+            ctx.fillText(obs.icon, obs.x, obs.y + obs.size);
+            ctx.restore();
+          });
+
+          document.getElementById("g1-score").innerText = g1Score;
+
+          if (g1Over) {
+            ctx.fillStyle = "rgba(10, 10, 26, 0.88)";
+            ctx.fillRect(0, 0, cv1.width, cv1.height);
+            ctx.fillStyle = "#ff0080";
+            ctx.font = "900 24px Outfit, sans-serif";
+            ctx.textAlign = "center";
+            ctx.fillText("💥 THUA RỒI!", cv1.width / 2, cv1.height / 2 - 12);
+            ctx.fillStyle = "#fff";
+            ctx.font = "15px Outfit, sans-serif";
+            ctx.fillText(
+              "Điểm đạt được: " + g1Score,
+              cv1.width / 2,
+              cv1.height / 2 + 18,
+            );
+            return;
+          }
+
+          loop1 = requestAnimationFrame(update);
+        }
+        update();
+      }
+
+      // ========================================================
+      // LOGIC GAME 2: PIKO CHẠY VƯỢT RÀO
+      // ========================================================
+      let g2Score = 0,
+        g2Lives = 3,
+        g2Over = false;
+      const groundY = 265;
+      let g2Runner = {
+        x: 45,
+        y: groundY - 50,
+        w: 50,
+        h: 50,
+        vy: 0,
+        gravity: 0.82,
+        jumpPower: -13.5,
+        isGrounded: true,
+      };
+
+      let g2Obstacles = [];
+      let particles = [];
+      let bgOffset = 0;
+      let invulnerableTimer = 0;
+
+      const obstacleTypes = [
+        { icon: "📦", size: 30 },
+        { icon: "🪨", size: 32 },
+        { icon: "🔥", size: 34 },
+        { icon: "🌵", size: 36 },
+      ];
+
+      function triggerG2Jump() {
+        if (g2Runner.isGrounded && !g2Over) {
+          g2Runner.vy = g2Runner.jumpPower;
+          g2Runner.isGrounded = false;
+          for (let i = 0; i < 8; i++) {
+            particles.push({
+              x: g2Runner.x + 20,
+              y: groundY - 5,
+              vx: (Math.random() - 0.5) * 4,
+              vy: -Math.random() * 3,
+              alpha: 1,
+            });
+          }
+        }
+      }
+
+      function initGame2() {
+        const cv = document.getElementById("canvas-game2");
+        const ctx = cv.getContext("2d");
+        g2Score = 0;
+        g2Lives = 3;
+        g2Over = false;
+        g2Obstacles = [];
+        particles = [];
+        invulnerableTimer = 0;
+        g2Runner.y = groundY - g2Runner.h;
+        g2Runner.vy = 0;
+        g2Runner.isGrounded = true;
+
+        let frameCount = 0;
+        let gameSpeed = 5.2;
+
+        function update() {
+          if (g2Over) return;
+
+          g2Runner.vy += g2Runner.gravity;
+          g2Runner.y += g2Runner.vy;
+
+          if (g2Runner.y >= groundY - g2Runner.h) {
+            g2Runner.y = groundY - g2Runner.h;
+            g2Runner.vy = 0;
+            g2Runner.isGrounded = true;
+          }
+
+          frameCount++;
+          bgOffset += gameSpeed * 0.5;
+          if (invulnerableTimer > 0) invulnerableTimer--;
+
+          gameSpeed = 5.2 + Math.floor(g2Score / 100) * 0.5;
+
+          if (
+            frameCount % Math.max(48, 85 - Math.floor(g2Score / 50) * 5) ===
+            0
+          ) {
+            let type =
+              obstacleTypes[Math.floor(Math.random() * obstacleTypes.length)];
+            g2Obstacles.push({
+              x: cv.width + 20,
+              y: groundY - type.size + 2,
+              type: type,
+              passed: false,
+            });
+          }
+
+          for (let i = g2Obstacles.length - 1; i >= 0; i--) {
+            let obs = g2Obstacles[i];
+            obs.x -= gameSpeed;
+
+            if (!obs.passed && obs.x < g2Runner.x) {
+              obs.passed = true;
+              g2Score += 10;
+            }
+
+            if (
+              invulnerableTimer === 0 &&
+              g2Runner.x < obs.x + obs.type.size - 10 &&
+              g2Runner.x + g2Runner.w > obs.x + 10 &&
+              g2Runner.y + g2Runner.h > obs.y + 8
+            ) {
+              g2Lives--;
+              invulnerableTimer = 40;
+              if (g2Lives <= 0) g2Over = true;
+            }
+
+            if (obs.x < -40) g2Obstacles.splice(i, 1);
+          }
+
+          let skyGrad = ctx.createLinearGradient(0, 0, 0, cv.height);
+          skyGrad.addColorStop(0, "#fd79a8");
+          skyGrad.addColorStop(0.5, "#e84393");
+          skyGrad.addColorStop(1, "#ff7675");
+          ctx.fillStyle = skyGrad;
+          ctx.fillRect(0, 0, cv.width, cv.height);
+
+          ctx.fillStyle = "rgba(255, 234, 167, 0.4)";
+          ctx.beginPath();
+          ctx.arc(cv.width / 2, 120, 65, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = "rgba(108, 92, 231, 0.35)";
+          ctx.beginPath();
+          ctx.moveTo(0, groundY);
+          for (let x = 0; x <= cv.width; x += 50) {
+            let mountainH = Math.sin((x + bgOffset * 0.2) * 0.02) * 25 + 50;
+            ctx.lineTo(x, groundY - mountainH);
+          }
+          ctx.lineTo(cv.width, groundY);
+          ctx.fill();
+
+          ctx.fillStyle = "#00b894";
+          ctx.fillRect(0, groundY, cv.width, cv.height - groundY);
+          ctx.fillStyle = "#55efc4";
+          ctx.fillRect(0, groundY, cv.width, 6);
+
+          ctx.strokeStyle = "rgba(255, 255, 255, 0.6)";
+          ctx.lineWidth = 3;
+          ctx.setLineDash([16, 16]);
+          ctx.lineDashOffset = -bgOffset * 1.5;
+          ctx.beginPath();
+          ctx.moveTo(0, groundY + 36);
+          ctx.lineTo(cv.width, groundY + 36);
+          ctx.stroke();
+          ctx.setLineDash([]);
+
+          for (let i = particles.length - 1; i >= 0; i--) {
+            let p = particles[i];
+            p.x += p.vx;
+            p.y += p.vy;
+            p.alpha -= 0.05;
+            if (p.alpha <= 0) {
+              particles.splice(i, 1);
+              continue;
+            }
+            ctx.fillStyle = `rgba(255, 255, 255, ${p.alpha})`;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+            ctx.fill();
+          }
+
+          g2Obstacles.forEach((obs) => {
+            ctx.font = `${obs.type.size}px Arial`;
+            ctx.fillText(obs.type.icon, obs.x, obs.y + obs.type.size - 4);
+          });
+
+          let activeImg = processedPikoImages[selectedPikoType];
+          if (activeImg && activeImg.complete && activeImg.naturalWidth !== 0) {
+            ctx.save();
+            let runBounce = g2Runner.isGrounded
+              ? Math.sin(frameCount * 0.3) * 3
+              : 0;
+            if (invulnerableTimer % 6 < 3) {
+              ctx.drawImage(
+                activeImg,
+                g2Runner.x,
+                g2Runner.y + runBounce,
+                g2Runner.w,
+                g2Runner.h,
+              );
+            }
+            ctx.restore();
+          }
+
+          document.getElementById("g2-score").innerText = g2Score;
+          document.getElementById("g2-lives").innerText = "❤️".repeat(
+            Math.max(0, g2Lives),
+          );
+
+          if (g2Over) {
+            ctx.fillStyle = "rgba(45, 52, 54, 0.88)";
+            ctx.fillRect(0, 0, cv.width, cv.height);
+            ctx.fillStyle = "#ff7675";
+            ctx.font = "900 24px Outfit, sans-serif";
+            ctx.textAlign = "center";
+            ctx.fillText(
+              "💥 VẤP RÀO THUA RỒI!",
+              cv.width / 2,
+              cv.height / 2 - 12,
+            );
+            ctx.fillStyle = "#fff";
+            ctx.font = "15px Outfit, sans-serif";
+            ctx.fillText(
+              "Quãng đường chạy: " + g2Score + "m",
+              cv.width / 2,
+              cv.height / 2 + 18,
+            );
+            return;
+          }
+
+          loop2 = requestAnimationFrame(update);
+        }
+        update();
+      }
+
+      // SỰ KIỆN BÀN PHÍM LƯU ĐIỀU HƯỚNG
+      window.addEventListener("keydown", (e) => {
+        g1Keys[e.code] = true;
+        if (e.code === "Space" || e.code === "ArrowUp" || e.code === "KeyW") {
+          triggerG2Jump();
+        }
+      });
+
+      window.addEventListener("keyup", (e) => {
+        g1Keys[e.code] = false;
+      });
+    </script>
+  </body>
+</html>
