@@ -1,0 +1,738 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PikoChat - Trò Chuyện Cùng Linh Vật</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+
+    <!-- CSS TẠO HIỆU ỨNG LINH VẬT ĐI DẠO & TƯƠNG TÁC -->
+    <style>
+      #running-mascots {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 9999;
+        overflow: hidden;
+      }
+
+      .mascot-wrapper {
+        position: absolute;
+        width: 150px;
+        pointer-events: auto;
+        cursor: grab; /* Đổi con trỏ thành hình bàn tay có thể nắm */
+      }
+
+      .mascot-wrapper:active {
+        cursor: grabbing; /* Con trỏ khi đang nắm kéo */
+      }
+
+      .run-mascot {
+        width: 100%;
+        height: auto;
+        object-fit: contain;
+        filter: drop-shadow(0px 15px 15px rgba(0, 0, 0, 0.4));
+        transition: transform 0.4s ease-out;
+      }
+
+      /* ---------------- BONG BÓNG CHAT KHI ĐỤNG NHAU ---------------- */
+      .mascot-bubble {
+        position: absolute;
+        top: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: white;
+        color: #333;
+        padding: 5px 12px;
+        border-radius: 15px;
+        font-size: 13px;
+        font-weight: bold;
+        white-space: nowrap;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        opacity: 0;
+        transition: opacity 0.3s;
+        pointer-events: none;
+        z-index: 10;
+      }
+      .mascot-bubble::after {
+        content: "";
+        position: absolute;
+        bottom: -5px;
+        left: 50%;
+        transform: translateX(-50%);
+        border-width: 5px 5px 0;
+        border-style: solid;
+        border-color: white transparent transparent transparent;
+      }
+
+      /* ---------------- CÁC TRẠNG THÁI ---------------- */
+      .mascot-wrapper.fallen,
+      .mascot-wrapper.fallen .run-mascot {
+        animation-play-state: paused !important;
+      }
+      .mascot-wrapper.fallen .run-mascot {
+        transform: rotate(-90deg) translateY(30px) !important;
+        filter: drop-shadow(15px 0px 15px rgba(0, 0, 0, 0.4));
+      }
+
+      .mascot-wrapper.interacting,
+      .mascot-wrapper.interacting .run-mascot {
+        animation-play-state: paused !important;
+      }
+      .mascot-wrapper.interacting .mascot-bubble {
+        opacity: 1;
+      }
+
+      /* Lớp khi đang bị nắm kéo thả */
+      .mascot-wrapper.dragging {
+        animation: none !important; /* Dừng việc tự đi dạo */
+        z-index: 10000;
+      }
+      .mascot-wrapper.dragging .run-mascot {
+        animation: none !important;
+        transform: scale(1.1) !important; /* Phóng to nhẹ khi bị bế lên */
+        filter: drop-shadow(
+          0px 25px 20px rgba(0, 0, 0, 0.6)
+        ); /* Bóng đổ xa hơn */
+      }
+
+      /* ---------------- KỊCH BẢN DI CHUYỂN ---------------- */
+      .mascot-1 {
+        animation: move1 35s linear infinite;
+      }
+      .mascot-1 .run-mascot {
+        animation: flip1 35s linear infinite;
+      }
+      @keyframes move1 {
+        0% {
+          left: -20%;
+          top: 10%;
+        }
+        25% {
+          left: 80%;
+          top: 70%;
+        }
+        26% {
+          left: 80%;
+          top: 70%;
+        }
+        50% {
+          left: -10%;
+          top: 90%;
+        }
+        51% {
+          left: -10%;
+          top: 90%;
+        }
+        75% {
+          left: 70%;
+          top: 10%;
+        }
+        76% {
+          left: 70%;
+          top: 10%;
+        }
+        100% {
+          left: -20%;
+          top: 10%;
+        }
+      }
+      @keyframes flip1 {
+        0%,
+        25% {
+          transform: scaleX(-1);
+        }
+        26%,
+        50% {
+          transform: scaleX(1);
+        }
+        51%,
+        75% {
+          transform: scaleX(-1);
+        }
+        76%,
+        100% {
+          transform: scaleX(1);
+        }
+      }
+
+      .mascot-2 {
+        animation: move2 40s linear infinite;
+      }
+      .mascot-2 .run-mascot {
+        animation: flip2 40s linear infinite;
+      }
+      @keyframes move2 {
+        0% {
+          left: 110%;
+          top: 80%;
+        }
+        25% {
+          left: 20%;
+          top: 20%;
+        }
+        26% {
+          left: 20%;
+          top: 20%;
+        }
+        50% {
+          left: 90%;
+          top: 10%;
+        }
+        51% {
+          left: 90%;
+          top: 10%;
+        }
+        75% {
+          left: -10%;
+          top: 60%;
+        }
+        76% {
+          left: -10%;
+          top: 60%;
+        }
+        100% {
+          left: 110%;
+          top: 80%;
+        }
+      }
+      @keyframes flip2 {
+        0%,
+        25% {
+          transform: scaleX(-1);
+        }
+        26%,
+        50% {
+          transform: scaleX(1);
+        }
+        51%,
+        75% {
+          transform: scaleX(-1);
+        }
+        76%,
+        100% {
+          transform: scaleX(1);
+        }
+      }
+
+      .mascot-3 {
+        animation: move3 45s linear infinite;
+      }
+      .mascot-3 .run-mascot {
+        animation: flip3 45s linear infinite;
+      }
+      @keyframes move3 {
+        0% {
+          left: 50%;
+          top: -20%;
+        }
+        33% {
+          left: 110%;
+          top: 60%;
+        }
+        34% {
+          left: 110%;
+          top: 60%;
+        }
+        66% {
+          left: -10%;
+          top: 80%;
+        }
+        67% {
+          left: -10%;
+          top: 80%;
+        }
+        100% {
+          left: 50%;
+          top: -20%;
+        }
+      }
+      @keyframes flip3 {
+        0%,
+        33% {
+          transform: scaleX(1);
+        }
+        34%,
+        66% {
+          transform: scaleX(-1);
+        }
+        67%,
+        100% {
+          transform: scaleX(1);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ĐỔI ONCLICK THÀNH ONDBLCLICK ĐỂ NHÁY ĐÚP LÀ TÉ -->
+    <div id="running-mascots">
+      <div
+        id="m1"
+        class="mascot-wrapper mascot-1"
+        data-type="cot-nha"
+        ondblclick="fallDown(this)"
+      >
+        <div class="mascot-bubble">Lêu lêu!</div>
+        <video
+          src="images/mascot_funny.webm"
+          class="run-mascot"
+          autoplay
+          loop
+          muted
+          playsinline
+        ></video>
+      </div>
+      <div
+        id="m2"
+        class="mascot-wrapper mascot-2"
+        data-type="coc-can"
+        ondblclick="fallDown(this)"
+      >
+        <div class="mascot-bubble">Tránh ra!</div>
+        <video
+          src="images/mascot_angry.webm"
+          class="run-mascot"
+          autoplay
+          loop
+          muted
+          playsinline
+        ></video>
+      </div>
+      <div
+        id="m3"
+        class="mascot-wrapper mascot-3"
+        data-type="de-thuong"
+        ondblclick="fallDown(this)"
+      >
+        <div class="mascot-bubble">Chào cậu! ❤️</div>
+        <video
+          src="images/mascot_short_legs.webm"
+          class="run-mascot"
+          autoplay
+          loop
+          muted
+          playsinline
+        ></video>
+      </div>
+    </div>
+
+    <!-- MÀN HÌNH ĐĂNG NHẬP -->
+    <div id="auth-screen" class="screen active">
+      <div class="auth-container">
+        <div class="auth-banner">
+          <img
+            src="images/mascot-main.png"
+            alt="Linh vật PikoChat"
+            onerror="
+              this.src = 'https://api.dicebear.com/7.x/bottts/svg?seed=PikoMain'
+            "
+          />
+          <h1>PikoChat</h1>
+          <p>Hệ thống tư vấn & trò chuyện thông minh</p>
+        </div>
+        <div class="auth-form-box">
+          <h2 id="auth-title">Đăng Nhập</h2>
+          <form id="auth-form" onsubmit="handleAuth(event)">
+            <div class="input-group">
+              <label>Tên tài khoản</label>
+              <input
+                type="text"
+                id="username"
+                required
+                placeholder="Nhập admin"
+              />
+            </div>
+            <div class="input-group">
+              <label>Mật khẩu</label>
+              <input
+                type="password"
+                id="password"
+                required
+                placeholder="Nhập 123456"
+              />
+            </div>
+            <button type="submit" class="btn-submit" id="auth-btn">
+              Đăng Nhập
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- MÀN HÌNH CHỌN & CHAT (Giữ nguyên) -->
+    <div id="select-screen" class="screen">
+      <div class="select-container">
+        <div class="select-title"><h2>Chọn Linh Vật</h2></div>
+        <div class="character-grid">
+          <div
+            class="char-card"
+            data-id="cot-nha"
+            onclick="toggleSelectChar(this)"
+          >
+            <img
+              src="images/mascot-funny.png"
+              onerror="
+                this.src = 'https://api.dicebear.com/7.x/bottts/svg?seed=Funny'
+              "
+            />
+            <h3>Piko Cợt Nhã</h3>
+          </div>
+          <div
+            class="char-card"
+            data-id="coc-can"
+            onclick="toggleSelectChar(this)"
+          >
+            <img
+              src="images/mascot-angry.png"
+              onerror="
+                this.src = 'https://api.dicebear.com/7.x/bottts/svg?seed=Angry'
+              "
+            />
+            <h3>Piko Cọc Cằn</h3>
+          </div>
+          <div
+            class="char-card"
+            data-id="de-thuong"
+            onclick="toggleSelectChar(this)"
+          >
+            <img
+              src="images/mascot-cute.jpg"
+              onerror="
+                this.src = 'https://api.dicebear.com/7.x/bottts/svg?seed=Cute'
+              "
+            />
+            <h3>Piko Dễ Thương</h3>
+          </div>
+        </div>
+        <button class="btn-submit" onclick="startChat()">
+          Bắt Đầu Trò Chuyện
+        </button>
+      </div>
+    </div>
+
+    <div id="chat-screen" class="screen">
+      <div class="chat-container">
+        <div class="sidebar">
+          <h3 style="color: white; margin-bottom: 20px" id="display-username">
+            User
+          </h3>
+          <button
+            class="btn-submit"
+            style="background-color: #ffc107; color: black; margin-bottom: 10px"
+            onclick="backToSelect()"
+          >
+            Quay lại chọn NV
+          </button>
+          <button
+            class="btn-submit"
+            style="background-color: #dc3545"
+            onclick="logout()"
+          >
+            Đăng xuất
+          </button>
+        </div>
+        <div class="chat-main">
+          <div class="chat-box" id="chat-box"></div>
+          <form class="chat-input-area" onsubmit="sendMessage(event)">
+            <input
+              type="text"
+              id="user-input"
+              required
+              placeholder="Nhập tin nhắn..."
+              autocomplete="off"
+            />
+            <button type="submit">Gửi</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // ==========================================
+      // 1. HỆ THỐNG KÉO THẢ LINH VẬT (DRAG & DROP)
+      // ==========================================
+      let isDragging = false;
+      let currentMascot = null;
+      let offsetX, offsetY;
+
+      function startDrag(e) {
+        // Tìm xem có bấm trúng linh vật không
+        const mascot = e.target.closest(".mascot-wrapper");
+        if (mascot) {
+          isDragging = true;
+          currentMascot = mascot;
+
+          // Xóa trạng thái té ngã nếu đang có, và thêm class Dragging
+          currentMascot.classList.remove("fallen");
+          currentMascot.classList.add("dragging");
+
+          // Lấy tọa độ chuột (Hỗ trợ cả máy tính lẫn điện thoại cảm ứng)
+          const clientX = e.type.includes("mouse")
+            ? e.clientX
+            : e.touches[0].clientX;
+          const clientY = e.type.includes("mouse")
+            ? e.clientY
+            : e.touches[0].clientY;
+
+          // Lấy vị trí thực tế của bé trên màn hình
+          const rect = currentMascot.getBoundingClientRect();
+          offsetX = clientX - rect.left;
+          offsetY = clientY - rect.top;
+
+          // Cố định vị trí vào tay chuột
+          currentMascot.style.left = rect.left + "px";
+          currentMascot.style.top = rect.top + "px";
+        }
+      }
+
+      function drag(e) {
+        if (!isDragging || !currentMascot) return;
+        e.preventDefault(); // Ngăn cuộn trang khi đang kéo trên điện thoại
+
+        const clientX = e.type.includes("mouse")
+          ? e.clientX
+          : e.touches[0].clientX;
+        const clientY = e.type.includes("mouse")
+          ? e.clientY
+          : e.touches[0].clientY;
+
+        // Cập nhật vị trí linh vật chạy theo chuột
+        currentMascot.style.left = clientX - offsetX + "px";
+        currentMascot.style.top = clientY - offsetY + "px";
+      }
+
+      function stopDrag() {
+        if (!isDragging || !currentMascot) return;
+        isDragging = false;
+        currentMascot.classList.remove("dragging");
+
+        // Xóa style nội tuyến để bé quay lại kịch bản đi dạo ban đầu
+        currentMascot.style.left = "";
+        currentMascot.style.top = "";
+        currentMascot = null;
+      }
+
+      // Lắng nghe sự kiện chuột
+      document.addEventListener("mousedown", startDrag);
+      document.addEventListener("mousemove", drag);
+      document.addEventListener("mouseup", stopDrag);
+
+      // Lắng nghe sự kiện cảm ứng trên điện thoại
+      document.addEventListener("touchstart", startDrag, { passive: false });
+      document.addEventListener("touchmove", drag, { passive: false });
+      document.addEventListener("touchend", stopDrag);
+
+      // ==========================================
+      // 2. CÁC HIỆU ỨNG CŨ (ĐỤNG NHAU, TÉ NGÃ)
+      // ==========================================
+      const mascotElements = [
+        document.getElementById("m1"),
+        document.getElementById("m2"),
+        document.getElementById("m3"),
+      ];
+
+      const randomDialogues = {
+        "cot-nha": [
+          "Ui za móp đầu!",
+          "Đụng rùi lêu lêu 🤪",
+          "Đi đứng kiểu gì dị!",
+          "Há há né ra coi!",
+        ],
+        "coc-can": [
+          "Đi đứng mù à! 🤬",
+          "Tránh cái coi!! 🔥",
+          "Muốn uýnh lộn hông?",
+          "Cản đường tao!",
+        ],
+        "de-thuong": [
+          "Ôi tớ xin lỗi nha~",
+          "Ui da đau tớ nè 🥺",
+          "Cậu đi cẩn thận nha ❤️",
+          "Hí hí chạm nhau rùi!",
+        ],
+      };
+
+      function getCenter(element) {
+        const rect = element.getBoundingClientRect();
+        return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+      }
+
+      setInterval(() => {
+        for (let i = 0; i < mascotElements.length; i++) {
+          for (let j = i + 1; j < mascotElements.length; j++) {
+            const m1 = mascotElements[i];
+            const m2 = mascotElements[j];
+
+            // Không tương tác nếu đang té hoặc đang bị kéo thả
+            if (
+              m1.classList.contains("fallen") ||
+              m2.classList.contains("fallen") ||
+              m1.classList.contains("dragging") ||
+              m2.classList.contains("dragging") ||
+              m1.classList.contains("interacting") ||
+              m2.classList.contains("interacting")
+            )
+              continue;
+
+            const c1 = getCenter(m1);
+            const c2 = getCenter(m2);
+            const distance = Math.hypot(c1.x - c2.x, c1.y - c2.y);
+
+            if (distance < 100) {
+              triggerInteraction(m1, m2);
+            }
+          }
+        }
+      }, 200);
+
+      function triggerInteraction(m1, m2) {
+        m1.classList.add("interacting");
+        m2.classList.add("interacting");
+
+        const type1 = m1.getAttribute("data-type");
+        const type2 = m2.getAttribute("data-type");
+        m1.querySelector(".mascot-bubble").innerText =
+          randomDialogues[type1][
+            Math.floor(Math.random() * randomDialogues[type1].length)
+          ];
+        m2.querySelector(".mascot-bubble").innerText =
+          randomDialogues[type2][
+            Math.floor(Math.random() * randomDialogues[type2].length)
+          ];
+
+        setTimeout(() => {
+          m1.classList.remove("interacting");
+          m2.classList.remove("interacting");
+        }, 2500);
+      }
+
+      function fallDown(wrapper) {
+        if (
+          wrapper.classList.contains("fallen") ||
+          wrapper.classList.contains("interacting")
+        )
+          return;
+        wrapper.classList.add("fallen");
+        setTimeout(() => {
+          wrapper.classList.remove("fallen");
+        }, 3000);
+      }
+
+      // ==========================================
+      // 3. LOGIC APP (ĐĂNG NHẬP, CHAT)
+      // ==========================================
+      const BOTS = {
+        "cot-nha": {
+          name: "Piko Cợt Nhã",
+          avatar: "images/mascot-funny.png",
+          color: "#28a745",
+          responses: [
+            "Haha, hỏi câu này cũng hỏi! 😂",
+            "Đùa tí thôi, chứ tui không biết đâu nha 🤪",
+            "Nghe vô lý nhưng lại rất thuyết phục! 👏",
+          ],
+        },
+        "coc-can": {
+          name: "Piko Cọc Cằn",
+          avatar: "images/mascot-angry.png",
+          color: "#dc3545",
+          responses: [
+            "Nhanh gọn lẹ giùm cái, đang cáu! 🔥",
+            "Hỏi hoài, đau đầu quá! 😡",
+            "Biết rồi, khổ lắm, nói mãi! 😤",
+          ],
+        },
+        "de-thuong": {
+          name: "Piko Dễ Thương",
+          avatar: "images/mascot-cute.jpg",
+          color: "#e83e8c",
+          responses: [
+            "Cậu ơi, Piko ở đây nghe cậu nói nè~ 🥰",
+            "Moa moa~ Cố lên nha, mọi chuyện rồi sẽ ổn thôi mà! ✨",
+            "Piko thương cậu nhất luôn á! ❤️",
+          ],
+        },
+      };
+
+      let selectedBotIds = [];
+
+      function showScreen(screenId) {
+        document
+          .querySelectorAll(".screen")
+          .forEach((s) => s.classList.remove("active"));
+        document.getElementById(screenId).classList.add("active");
+      }
+
+      function handleAuth(e) {
+        e.preventDefault();
+        const u = document.getElementById("username").value.trim();
+        const p = document.getElementById("password").value.trim();
+
+        if (u === "admin" && p === "123456") {
+          document.getElementById("display-username").innerText = "Chào, " + u;
+          showScreen("select-screen");
+        } else {
+          alert("Sai tài khoản hoặc mật khẩu!");
+        }
+      }
+
+      function backToSelect() {
+        showScreen("select-screen");
+      }
+      function toggleSelectChar(card) {
+        card.classList.toggle("selected");
+      }
+
+      function startChat() {
+        const selected = document.querySelectorAll(".char-card.selected");
+        if (selected.length === 0) return alert("Hãy chọn ít nhất 1 linh vật!");
+
+        selectedBotIds = Array.from(selected).map((c) =>
+          c.getAttribute("data-id"),
+        );
+        document.getElementById("chat-box").innerHTML =
+          '<div style="text-align: center; color: #888; padding: 10px;">Cuộc trò chuyện đã bắt đầu!</div>';
+        showScreen("chat-screen");
+      }
+
+      function sendMessage(e) {
+        e.preventDefault();
+        const input = document.getElementById("user-input");
+        const text = input.value.trim();
+        if (!text) return;
+
+        const chatBox = document.getElementById("chat-box");
+        chatBox.innerHTML += `<div style="margin: 10px 0; text-align: right;"><span style="background: #007bff; color: white; padding: 8px 15px; border-radius: 15px; display: inline-block; max-width: 80%;">${text}</span></div>`;
+        input.value = "";
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        selectedBotIds.forEach((botId) => {
+          const bot = BOTS[botId];
+          const randomReply =
+            bot.responses[Math.floor(Math.random() * bot.responses.length)];
+
+          setTimeout(() => {
+            chatBox.innerHTML += `<div style="margin: 10px 0; text-align: left;"><span style="color: ${bot.color}; font-weight: bold; font-size: 14px;">${bot.name}</span><br><span style="background: #f1f1f1; color: #333; padding: 8px 15px; border-radius: 15px; display: inline-block; max-width: 80%; margin-top: 5px;">${randomReply}</span></div>`;
+            chatBox.scrollTop = chatBox.scrollHeight;
+          }, 500);
+        });
+      }
+
+      function logout() {
+        document
+          .querySelectorAll(".char-card")
+          .forEach((c) => c.classList.remove("selected"));
+        document.getElementById("username").value = "";
+        document.getElementById("password").value = "";
+        showScreen("auth-screen");
+      }
+    </script>
+  </body>
+</html>
