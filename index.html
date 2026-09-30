@@ -10,14 +10,29 @@
     />
     <link rel="stylesheet" href="css/style.css" />
 
-    <!-- CSS TẠO HIỆU ỨNG LINH VẬT ĐI DẠO & TƯƠNG TÁC -->
     <style>
+      :root {
+        --primary-bg: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+        --card-bg: rgba(255, 255, 255, 0.88);
+        --accent-color: #6c5ce7;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background: var(--primary-bg);
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      /* 3 LINH VẬT ĐI DẠO & TƯƠNG TÁC MÀN HÌNH */
       #running-mascots {
         position: fixed;
         top: 0;
         left: 0;
-        width: 100%;
-        height: 100%;
+        width: 100vw;
+        height: 100vh;
         pointer-events: none;
         z-index: 9999;
         overflow: hidden;
@@ -25,321 +40,389 @@
 
       .mascot-wrapper {
         position: absolute;
-        width: 150px;
+        width: 120px;
         pointer-events: auto;
-        cursor: grab; /* Đổi con trỏ thành hình bàn tay có thể nắm */
+        cursor: grab;
+        transition: transform 0.3s ease;
       }
 
-      .mascot-wrapper:active {
-        cursor: grabbing; /* Con trỏ khi đang nắm kéo */
+      .mascot-wrapper:hover {
+        transform: scale(1.15) !important;
       }
 
       .run-mascot {
         width: 100%;
         height: auto;
         object-fit: contain;
-        filter: drop-shadow(0px 15px 15px rgba(0, 0, 0, 0.4));
-        transition: transform 0.4s ease-out;
+        filter: drop-shadow(0px 8px 15px rgba(0, 0, 0, 0.2));
       }
 
-      /* ---------------- BONG BÓNG CHAT KHI ĐỤNG NHAU ---------------- */
+      /* BÓNG THOẠI HỘI THOẠI */
       .mascot-bubble {
         position: absolute;
-        top: -30px;
+        top: -45px;
         left: 50%;
         transform: translateX(-50%);
-        background: white;
-        color: #333;
-        padding: 5px 12px;
-        border-radius: 15px;
+        background: #ffffff;
+        color: #2d3436;
+        padding: 6px 14px;
+        border-radius: 18px;
         font-size: 13px;
-        font-weight: bold;
+        font-weight: 700;
         white-space: nowrap;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
         opacity: 0;
-        transition: opacity 0.3s;
+        transition:
+          opacity 0.4s ease,
+          transform 0.3s ease;
         pointer-events: none;
         z-index: 10;
+        border: 2px solid #6c5ce7;
       }
+
       .mascot-bubble::after {
         content: "";
         position: absolute;
-        bottom: -5px;
+        bottom: -7px;
         left: 50%;
         transform: translateX(-50%);
-        border-width: 5px 5px 0;
+        border-width: 7px 7px 0;
         border-style: solid;
-        border-color: white transparent transparent transparent;
+        border-color: #6c5ce7 transparent transparent transparent;
       }
 
-      /* ---------------- CÁC TRẠNG THÁI ---------------- */
-      .mascot-wrapper.fallen,
-      .mascot-wrapper.fallen .run-mascot {
-        animation-play-state: paused !important;
-      }
-      .mascot-wrapper.fallen .run-mascot {
-        transform: rotate(-90deg) translateY(30px) !important;
-        filter: drop-shadow(15px 0px 15px rgba(0, 0, 0, 0.4));
-      }
-
-      .mascot-wrapper.interacting,
-      .mascot-wrapper.interacting .run-mascot {
-        animation-play-state: paused !important;
-      }
-      .mascot-wrapper.interacting .mascot-bubble {
+      .mascot-wrapper.speaking .mascot-bubble {
         opacity: 1;
+        transform: translateX(-50%) translateY(-5px);
       }
 
-      /* Lớp khi đang bị nắm kéo thả */
-      .mascot-wrapper.dragging {
-        animation: none !important; /* Dừng việc tự đi dạo */
-        z-index: 10000;
-      }
-      .mascot-wrapper.dragging .run-mascot {
-        animation: none !important;
-        transform: scale(1.1) !important; /* Phóng to nhẹ khi bị bế lên */
-        filter: drop-shadow(
-          0px 25px 20px rgba(0, 0, 0, 0.6)
-        ); /* Bóng đổ xa hơn */
-      }
-
-      /* ---------------- KỊCH BẢN DI CHUYỂN ---------------- */
+      /* QUY ĐẠO DI CHUYỂN CỦA 3 LINH VẬT */
       .mascot-1 {
-        animation: move1 35s linear infinite;
+        animation: walkAround1 28s ease-in-out infinite alternate;
       }
-      .mascot-1 .run-mascot {
-        animation: flip1 35s linear infinite;
-      }
-      @keyframes move1 {
-        0% {
-          left: -20%;
-          top: 10%;
-        }
-        25% {
-          left: 80%;
-          top: 70%;
-        }
-        26% {
-          left: 80%;
-          top: 70%;
-        }
-        50% {
-          left: -10%;
-          top: 90%;
-        }
-        51% {
-          left: -10%;
-          top: 90%;
-        }
-        75% {
-          left: 70%;
-          top: 10%;
-        }
-        76% {
-          left: 70%;
-          top: 10%;
-        }
-        100% {
-          left: -20%;
-          top: 10%;
-        }
-      }
-      @keyframes flip1 {
-        0%,
-        25% {
-          transform: scaleX(-1);
-        }
-        26%,
-        50% {
-          transform: scaleX(1);
-        }
-        51%,
-        75% {
-          transform: scaleX(-1);
-        }
-        76%,
-        100% {
-          transform: scaleX(1);
-        }
-      }
-
       .mascot-2 {
-        animation: move2 40s linear infinite;
+        animation: walkAround2 34s ease-in-out infinite alternate;
       }
-      .mascot-2 .run-mascot {
-        animation: flip2 40s linear infinite;
+      .mascot-3 {
+        animation: walkAround3 30s ease-in-out infinite alternate;
       }
-      @keyframes move2 {
+
+      @keyframes walkAround1 {
         0% {
-          left: 110%;
-          top: 80%;
-        }
-        25% {
-          left: 20%;
-          top: 20%;
-        }
-        26% {
-          left: 20%;
-          top: 20%;
-        }
-        50% {
-          left: 90%;
           top: 10%;
-        }
-        51% {
-          left: 90%;
-          top: 10%;
-        }
-        75% {
-          left: -10%;
-          top: 60%;
-        }
-        76% {
-          left: -10%;
-          top: 60%;
-        }
-        100% {
-          left: 110%;
-          top: 80%;
-        }
-      }
-      @keyframes flip2 {
-        0%,
-        25% {
-          transform: scaleX(-1);
-        }
-        26%,
-        50% {
+          left: 5%;
           transform: scaleX(1);
         }
-        51%,
-        75% {
+        25% {
+          top: 75%;
+          left: 80%;
+          transform: scaleX(1);
+        }
+        50% {
+          top: 80%;
+          left: 15%;
           transform: scaleX(-1);
         }
-        76%,
+        75% {
+          top: 20%;
+          left: 70%;
+          transform: scaleX(-1);
+        }
         100% {
+          top: 10%;
+          left: 5%;
           transform: scaleX(1);
         }
       }
 
-      .mascot-3 {
-        animation: move3 45s linear infinite;
-      }
-      .mascot-3 .run-mascot {
-        animation: flip3 45s linear infinite;
-      }
-      @keyframes move3 {
+      @keyframes walkAround2 {
         0% {
-          left: 50%;
-          top: -20%;
-        }
-        33% {
-          left: 110%;
-          top: 60%;
-        }
-        34% {
-          left: 110%;
-          top: 60%;
-        }
-        66% {
-          left: -10%;
-          top: 80%;
-        }
-        67% {
-          left: -10%;
-          top: 80%;
-        }
-        100% {
-          left: 50%;
-          top: -20%;
-        }
-      }
-      @keyframes flip3 {
-        0%,
-        33% {
-          transform: scaleX(1);
-        }
-        34%,
-        66% {
+          top: 15%;
+          left: 85%;
           transform: scaleX(-1);
         }
-        67%,
-        100% {
+        30% {
+          top: 70%;
+          left: 10%;
+          transform: scaleX(-1);
+        }
+        60% {
+          top: 35%;
+          left: 50%;
           transform: scaleX(1);
         }
+        85% {
+          top: 80%;
+          left: 75%;
+          transform: scaleX(1);
+        }
+        100% {
+          top: 15%;
+          left: 85%;
+          transform: scaleX(-1);
+        }
+      }
+
+      @keyframes walkAround3 {
+        0% {
+          top: 70%;
+          left: 45%;
+          transform: scaleX(1);
+        }
+        33% {
+          top: 12%;
+          left: 35%;
+          transform: scaleX(1);
+        }
+        66% {
+          top: 82%;
+          left: 85%;
+          transform: scaleX(-1);
+        }
+        100% {
+          top: 70%;
+          left: 45%;
+          transform: scaleX(1);
+        }
+      }
+
+      /* MÀN HÌNH CHÍNH */
+      .screen {
+        display: none;
+        min-height: 100vh;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        box-sizing: border-box;
+      }
+      .screen.active {
+        display: flex;
+      }
+
+      .auth-container,
+      .select-container,
+      .chat-container {
+        background: var(--card-bg);
+        backdrop-filter: blur(15px);
+        border-radius: 24px;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        overflow: hidden;
+      }
+
+      .auth-container {
+        display: flex;
+        max-width: 850px;
+        width: 100%;
+      }
+      .auth-banner {
+        background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+        color: white;
+        padding: 40px;
+        width: 40%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+      }
+      .auth-banner img {
+        width: 140px;
+        filter: drop-shadow(0 8px 15px rgba(0, 0, 0, 0.15));
+        margin-bottom: 15px;
+      }
+      .auth-form-box {
+        padding: 50px 40px;
+        width: 60%;
+      }
+
+      .select-container {
+        max-width: 900px;
+        width: 100%;
+        padding: 40px;
+        text-align: center;
+      }
+      .character-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+        margin: 30px 0;
+      }
+      .char-card {
+        background: white;
+        padding: 20px;
+        border-radius: 20px;
+        border: 3px solid transparent;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+      }
+      .char-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 12px 25px rgba(108, 92, 231, 0.2);
+      }
+      .char-card.selected {
+        border-color: var(--accent-color);
+        background: #f0edff;
+      }
+      .char-card img {
+        width: 110px;
+        height: 110px;
+        object-fit: contain;
+      }
+
+      .btn-submit {
+        background: linear-gradient(135deg, #6c5ce7, #a29bfe);
+        color: white;
+        border: none;
+        padding: 12px 28px;
+        border-radius: 12px;
+        font-weight: bold;
+        font-size: 15px;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 5px 15px rgba(108, 92, 231, 0.3);
+      }
+      .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(108, 92, 231, 0.4);
+      }
+
+      .btn-game-nav {
+        background: linear-gradient(135deg, #00b894, #55efc4) !important;
+        color: white !important;
+        margin-top: 15px;
+        display: inline-block;
+        text-align: center;
+        text-decoration: none;
+      }
+
+      /* KHUNG CHAT */
+      .chat-container {
+        width: 950px;
+        height: 600px;
+        display: flex;
+      }
+      .sidebar {
+        width: 250px;
+        background: #2d3436;
+        padding: 25px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .chat-main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background: #f8f9fa;
+      }
+      .chat-box {
+        flex: 1;
+        padding: 20px;
+        overflow-y: auto;
+      }
+      .chat-input-area {
+        display: flex;
+        padding: 15px;
+        background: white;
+        border-top: 1px solid #eee;
+        gap: 10px;
+      }
+      .chat-input-area input {
+        flex: 1;
+        padding: 12px 18px;
+        border: 2px solid #eee;
+        border-radius: 25px;
+        outline: none;
+      }
+      .chat-input-area button {
+        background: var(--accent-color);
+        color: white;
+        border: none;
+        padding: 0 25px;
+        border-radius: 25px;
+        cursor: pointer;
+        font-weight: bold;
+      }
+
+      .input-group {
+        margin-bottom: 20px;
+        text-align: left;
+      }
+      .input-group label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: 600;
+        color: #636e72;
+      }
+      .input-group input {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #dfe6e9;
+        border-radius: 10px;
+        outline: none;
+        box-sizing: border-box;
       }
     </style>
   </head>
   <body>
-    <!-- ĐỔI ONCLICK THÀNH ONDBLCLICK ĐỂ NHÁY ĐÚP LÀ TÉ -->
+    <!-- 3 LINH VẬT ĐI DẠO & TỰ TƯƠNG TÁC -->
     <div id="running-mascots">
-      <div
-        id="m1"
-        class="mascot-wrapper mascot-1"
-        data-type="cot-nha"
-        ondblclick="fallDown(this)"
-      >
-        <div class="mascot-bubble">Lêu lêu!</div>
-        <video
-          src="images/mascot_funny.webm"
+      <!-- Mascot 1: Cợt Nhã -->
+      <div id="m1" class="mascot-wrapper mascot-1">
+        <div class="mascot-bubble" id="b1">Alo anh em!</div>
+        <img
+          src="images/mascot-funny.png"
           class="run-mascot"
-          autoplay
-          loop
-          muted
-          playsinline
-        ></video>
+          onerror="
+            this.src = 'https://api.dicebear.com/7.x/bottts/svg?seed=Funny'
+          "
+        />
       </div>
-      <div
-        id="m2"
-        class="mascot-wrapper mascot-2"
-        data-type="coc-can"
-        ondblclick="fallDown(this)"
-      >
-        <div class="mascot-bubble">Tránh ra!</div>
-        <video
-          src="images/mascot_angry.webm"
+
+      <!-- Mascot 2: Cọc Cằn -->
+      <div id="m2" class="mascot-wrapper mascot-2">
+        <div class="mascot-bubble" id="b2">Nhìn gì mà nhìn!</div>
+        <img
+          src="images/mascot-angry.png"
           class="run-mascot"
-          autoplay
-          loop
-          muted
-          playsinline
-        ></video>
+          onerror="
+            this.src = 'https://api.dicebear.com/7.x/bottts/svg?seed=Angry'
+          "
+        />
       </div>
-      <div
-        id="m3"
-        class="mascot-wrapper mascot-3"
-        data-type="de-thuong"
-        ondblclick="fallDown(this)"
-      >
-        <div class="mascot-bubble">Chào cậu! ❤️</div>
-        <video
-          src="images/mascot_short_legs.webm"
+
+      <!-- Mascot 3: Dễ Thương -->
+      <div id="m3" class="mascot-wrapper mascot-3">
+        <div class="mascot-bubble" id="b3">Mọi người ơi~</div>
+        <img
+          src="images/mascot-cute.jpg"
           class="run-mascot"
-          autoplay
-          loop
-          muted
-          playsinline
-        ></video>
+          onerror="
+            this.src = 'https://api.dicebear.com/7.x/bottts/svg?seed=Cute'
+          "
+        />
       </div>
     </div>
 
-    <!-- MÀN HÌNH ĐĂNG NHẬP -->
+    <!-- MÀN HÌNH 1: ĐĂNG NHẬP -->
     <div id="auth-screen" class="screen active">
       <div class="auth-container">
         <div class="auth-banner">
           <img
             src="images/mascot-main.png"
-            alt="Linh vật PikoChat"
+            alt="PikoChat"
             onerror="
               this.src = 'https://api.dicebear.com/7.x/bottts/svg?seed=PikoMain'
             "
           />
           <h1>PikoChat</h1>
-          <p>Hệ thống tư vấn & trò chuyện thông minh</p>
+          <p>Tương tác vui vẻ cùng dàn linh vật Piko!</p>
         </div>
         <div class="auth-form-box">
-          <h2 id="auth-title">Đăng Nhập</h2>
-          <form id="auth-form" onsubmit="handleAuth(event)">
+          <h2 style="color: #2d3436; margin-bottom: 25px">Đăng Nhập</h2>
+          <form onsubmit="handleAuth(event)">
             <div class="input-group">
               <label>Tên tài khoản</label>
               <input
@@ -358,7 +441,7 @@
                 placeholder="Nhập 123456"
               />
             </div>
-            <button type="submit" class="btn-submit" id="auth-btn">
+            <button type="submit" class="btn-submit" style="width: 100%">
               Đăng Nhập
             </button>
           </form>
@@ -366,10 +449,16 @@
       </div>
     </div>
 
-    <!-- MÀN HÌNH CHỌN & CHAT (Giữ nguyên) -->
+    <!-- MÀN HÌNH 2: CHỌN LINH VẬT -->
     <div id="select-screen" class="screen">
       <div class="select-container">
-        <div class="select-title"><h2>Chọn Linh Vật</h2></div>
+        <h2 style="color: #2d3436; font-size: 28px">
+          Chọn Linh Vật Trò Chuyện
+        </h2>
+        <p style="color: #636e72">
+          Có thể chọn 1 hoặc nhiều linh vật cùng lúc nha!
+        </p>
+
         <div class="character-grid">
           <div
             class="char-card"
@@ -382,7 +471,7 @@
                 this.src = 'https://api.dicebear.com/7.x/bottts/svg?seed=Funny'
               "
             />
-            <h3>Piko Cợt Nhã</h3>
+            <h3 style="color: #28a745; margin-top: 10px">Piko Cợt Nhã</h3>
           </div>
           <div
             class="char-card"
@@ -395,7 +484,7 @@
                 this.src = 'https://api.dicebear.com/7.x/bottts/svg?seed=Angry'
               "
             />
-            <h3>Piko Cọc Cằn</h3>
+            <h3 style="color: #dc3545; margin-top: 10px">Piko Cọc Cằn</h3>
           </div>
           <div
             class="char-card"
@@ -408,15 +497,20 @@
                 this.src = 'https://api.dicebear.com/7.x/bottts/svg?seed=Cute'
               "
             />
-            <h3>Piko Dễ Thương</h3>
+            <h3 style="color: #e83e8c; margin-top: 10px">Piko Dễ Thương</h3>
           </div>
         </div>
+
         <button class="btn-submit" onclick="startChat()">
           Bắt Đầu Trò Chuyện
         </button>
+        <a href="game.html" class="btn-submit btn-game-nav"
+          >🎮 Sang Trang Chơi Game</a
+        >
       </div>
     </div>
 
+    <!-- MÀN HÌNH 3: CHAT -->
     <div id="chat-screen" class="screen">
       <div class="chat-container">
         <div class="sidebar">
@@ -425,14 +519,15 @@
           </h3>
           <button
             class="btn-submit"
-            style="background-color: #ffc107; color: black; margin-bottom: 10px"
-            onclick="backToSelect()"
+            style="background: #fdcb6e; color: #2d3436"
+            onclick="showScreen('select-screen')"
           >
-            Quay lại chọn NV
+            Đổi Linh Vật
           </button>
+          <a href="game.html" class="btn-submit btn-game-nav">Chơi Game</a>
           <button
             class="btn-submit"
-            style="background-color: #dc3545"
+            style="background: #ff7675; margin-top: auto"
             onclick="logout()"
           >
             Đăng xuất
@@ -455,214 +550,129 @@
     </div>
 
     <script>
-      // ==========================================
-      // 1. HỆ THỐNG KÉO THẢ LINH VẬT (DRAG & DROP)
-      // ==========================================
-      let isDragging = false;
-      let currentMascot = null;
-      let offsetX, offsetY;
-
-      function startDrag(e) {
-        // Tìm xem có bấm trúng linh vật không
-        const mascot = e.target.closest(".mascot-wrapper");
-        if (mascot) {
-          isDragging = true;
-          currentMascot = mascot;
-
-          // Xóa trạng thái té ngã nếu đang có, và thêm class Dragging
-          currentMascot.classList.remove("fallen");
-          currentMascot.classList.add("dragging");
-
-          // Lấy tọa độ chuột (Hỗ trợ cả máy tính lẫn điện thoại cảm ứng)
-          const clientX = e.type.includes("mouse")
-            ? e.clientX
-            : e.touches[0].clientX;
-          const clientY = e.type.includes("mouse")
-            ? e.clientY
-            : e.touches[0].clientY;
-
-          // Lấy vị trí thực tế của bé trên màn hình
-          const rect = currentMascot.getBoundingClientRect();
-          offsetX = clientX - rect.left;
-          offsetY = clientY - rect.top;
-
-          // Cố định vị trí vào tay chuột
-          currentMascot.style.left = rect.left + "px";
-          currentMascot.style.top = rect.top + "px";
+      // 1. BỘ TÁCH NỀN THÔNG MINH BẰNG HTML5 CANVAS (FLOOD FILL)
+      function removeMascotBackground(imgElement) {
+        if (!imgElement.complete || imgElement.naturalWidth === 0) {
+          imgElement.onload = () => removeMascotBackground(imgElement);
+          return;
         }
-      }
 
-      function drag(e) {
-        if (!isDragging || !currentMascot) return;
-        e.preventDefault(); // Ngăn cuộn trang khi đang kéo trên điện thoại
+        try {
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d", { willReadFrequently: true });
+          const width = imgElement.naturalWidth;
+          const height = imgElement.naturalHeight;
+          canvas.width = width;
+          canvas.height = height;
 
-        const clientX = e.type.includes("mouse")
-          ? e.clientX
-          : e.touches[0].clientX;
-        const clientY = e.type.includes("mouse")
-          ? e.clientY
-          : e.touches[0].clientY;
+          ctx.drawImage(imgElement, 0, 0);
+          const imageData = ctx.getImageData(0, 0, width, height);
+          const data = imageData.data;
 
-        // Cập nhật vị trí linh vật chạy theo chuột
-        currentMascot.style.left = clientX - offsetX + "px";
-        currentMascot.style.top = clientY - offsetY + "px";
-      }
+          const visited = new Uint8Array(width * height);
+          const queue = [];
 
-      function stopDrag() {
-        if (!isDragging || !currentMascot) return;
-        isDragging = false;
-        currentMascot.classList.remove("dragging");
+          // Khởi tạo hàng đợi từ 4 góc ảnh
+          const corners = [
+            [0, 0],
+            [width - 1, 0],
+            [0, height - 1],
+            [width - 1, height - 1],
+          ];
 
-        // Xóa style nội tuyến để bé quay lại kịch bản đi dạo ban đầu
-        currentMascot.style.left = "";
-        currentMascot.style.top = "";
-        currentMascot = null;
-      }
+          corners.forEach(([x, y]) => {
+            const idx = y * width + x;
+            queue.push(idx);
+            visited[idx] = 1;
+          });
 
-      // Lắng nghe sự kiện chuột
-      document.addEventListener("mousedown", startDrag);
-      document.addEventListener("mousemove", drag);
-      document.addEventListener("mouseup", stopDrag);
+          // Hàm kiểm tra màu nền sáng/trắng/xám
+          function isBgPixel(idx) {
+            const p = idx * 4;
+            const r = data[p],
+              g = data[p + 1],
+              b = data[p + 2];
+            return r > 185 && g > 185 && b > 185; // Ngưỡng nhận diện màu nền xám/trắng
+          }
 
-      // Lắng nghe sự kiện cảm ứng trên điện thoại
-      document.addEventListener("touchstart", startDrag, { passive: false });
-      document.addEventListener("touchmove", drag, { passive: false });
-      document.addEventListener("touchend", stopDrag);
+          // Thuật toán Loang từ 4 góc vào để xóa nền
+          while (queue.length > 0) {
+            const curr = queue.pop();
+            if (isBgPixel(curr)) {
+              data[curr * 4 + 3] = 0; // Đặt Alpha = 0 (xóa nền)
 
-      // ==========================================
-      // 2. CÁC HIỆU ỨNG CŨ (ĐỤNG NHAU, TÉ NGÃ)
-      // ==========================================
-      const mascotElements = [
-        document.getElementById("m1"),
-        document.getElementById("m2"),
-        document.getElementById("m3"),
-      ];
+              const cx = curr % width;
+              const cy = Math.floor(curr / width);
 
-      const randomDialogues = {
-        "cot-nha": [
-          "Ui za móp đầu!",
-          "Đụng rùi lêu lêu 🤪",
-          "Đi đứng kiểu gì dị!",
-          "Há há né ra coi!",
-        ],
-        "coc-can": [
-          "Đi đứng mù à! 🤬",
-          "Tránh cái coi!! 🔥",
-          "Muốn uýnh lộn hông?",
-          "Cản đường tao!",
-        ],
-        "de-thuong": [
-          "Ôi tớ xin lỗi nha~",
-          "Ui da đau tớ nè 🥺",
-          "Cậu đi cẩn thận nha ❤️",
-          "Hí hí chạm nhau rùi!",
-        ],
-      };
+              const neighbors = [];
+              if (cx > 0) neighbors.push(curr - 1);
+              if (cx < width - 1) neighbors.push(curr + 1);
+              if (cy > 0) neighbors.push(curr - width);
+              if (cy < height - 1) neighbors.push(curr + width);
 
-      function getCenter(element) {
-        const rect = element.getBoundingClientRect();
-        return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
-      }
-
-      setInterval(() => {
-        for (let i = 0; i < mascotElements.length; i++) {
-          for (let j = i + 1; j < mascotElements.length; j++) {
-            const m1 = mascotElements[i];
-            const m2 = mascotElements[j];
-
-            // Không tương tác nếu đang té hoặc đang bị kéo thả
-            if (
-              m1.classList.contains("fallen") ||
-              m2.classList.contains("fallen") ||
-              m1.classList.contains("dragging") ||
-              m2.classList.contains("dragging") ||
-              m1.classList.contains("interacting") ||
-              m2.classList.contains("interacting")
-            )
-              continue;
-
-            const c1 = getCenter(m1);
-            const c2 = getCenter(m2);
-            const distance = Math.hypot(c1.x - c2.x, c1.y - c2.y);
-
-            if (distance < 100) {
-              triggerInteraction(m1, m2);
+              for (let n of neighbors) {
+                if (!visited[n]) {
+                  visited[n] = 1;
+                  queue.push(n);
+                }
+              }
             }
           }
+
+          ctx.putImageData(imageData, 0, 0);
+          imgElement.src = canvas.toDataURL("image/png");
+        } catch (e) {
+          console.warn("Tự động tách nền thất bại:", e);
         }
-      }, 200);
-
-      function triggerInteraction(m1, m2) {
-        m1.classList.add("interacting");
-        m2.classList.add("interacting");
-
-        const type1 = m1.getAttribute("data-type");
-        const type2 = m2.getAttribute("data-type");
-        m1.querySelector(".mascot-bubble").innerText =
-          randomDialogues[type1][
-            Math.floor(Math.random() * randomDialogues[type1].length)
-          ];
-        m2.querySelector(".mascot-bubble").innerText =
-          randomDialogues[type2][
-            Math.floor(Math.random() * randomDialogues[type2].length)
-          ];
-
-        setTimeout(() => {
-          m1.classList.remove("interacting");
-          m2.classList.remove("interacting");
-        }, 2500);
       }
 
-      function fallDown(wrapper) {
-        if (
-          wrapper.classList.contains("fallen") ||
-          wrapper.classList.contains("interacting")
-        )
-          return;
-        wrapper.classList.add("fallen");
-        setTimeout(() => {
-          wrapper.classList.remove("fallen");
-        }, 3000);
+      function processAllMascotImages() {
+        const images = document.querySelectorAll(
+          ".run-mascot, .char-card img, .auth-banner img",
+        );
+        images.forEach((img) => removeMascotBackground(img));
       }
 
-      // ==========================================
-      // 3. LOGIC APP (ĐĂNG NHẬP, CHAT)
-      // ==========================================
-      const BOTS = {
-        "cot-nha": {
-          name: "Piko Cợt Nhã",
-          avatar: "images/mascot-funny.png",
-          color: "#28a745",
-          responses: [
-            "Haha, hỏi câu này cũng hỏi! 😂",
-            "Đùa tí thôi, chứ tui không biết đâu nha 🤪",
-            "Nghe vô lý nhưng lại rất thuyết phục! 👏",
-          ],
-        },
-        "coc-can": {
-          name: "Piko Cọc Cằn",
-          avatar: "images/mascot-angry.png",
-          color: "#dc3545",
-          responses: [
-            "Nhanh gọn lẹ giùm cái, đang cáu! 🔥",
-            "Hỏi hoài, đau đầu quá! 😡",
-            "Biết rồi, khổ lắm, nói mãi! 😤",
-          ],
-        },
-        "de-thuong": {
-          name: "Piko Dễ Thương",
-          avatar: "images/mascot-cute.jpg",
-          color: "#e83e8c",
-          responses: [
-            "Cậu ơi, Piko ở đây nghe cậu nói nè~ 🥰",
-            "Moa moa~ Cố lên nha, mọi chuyện rồi sẽ ổn thôi mà! ✨",
-            "Piko thương cậu nhất luôn á! ❤️",
-          ],
-        },
-      };
+      // 2. HỆ THỐNG TRÒ CHUYỆN TỰ ĐỘNG GIỮA 3 LINH VẬT TRÊN MÀN HÌNH
+      const DIALOGUES = [
+        [
+          { id: "m1", text: "Này Cọc Cằn, đi uống trà sữa hông? 🧋" },
+          { id: "m2", text: "Biến đi! Đang bực mình đây! 😡" },
+          { id: "m3", text: "Hai cậu đừng cãi nhau nữa mà~ 🥰" },
+        ],
+        [
+          { id: "m1", text: "Lêu lêu! Đố bắt được tui đó! 😜" },
+          { id: "m2", text: "Đứng lại đó cho tui! 🔥" },
+          { id: "m3", text: "Coi chừng té đó hai cậu ơi! 🥺" },
+        ],
+        [
+          { id: "m3", text: "Hôm nay trời đẹp quá nè! 🌸" },
+          { id: "m1", text: "Đẹp trời để đi quậy đó! 🥳" },
+          { id: "m2", text: "Nắng muốn cháy da luôn ở đó đẹp! 🙄" },
+        ],
+      ];
 
-      let selectedBotIds = [];
+      function startMascotConversations() {
+        setInterval(() => {
+          const conversation =
+            DIALOGUES[Math.floor(Math.random() * DIALOGUES.length)];
 
+          conversation.forEach((item, index) => {
+            setTimeout(() => {
+              const wrapper = document.getElementById(item.id);
+              const bubble = wrapper.querySelector(".mascot-bubble");
+              bubble.innerText = item.text;
+              wrapper.classList.add("speaking");
+
+              setTimeout(() => {
+                wrapper.classList.remove("speaking");
+              }, 3000);
+            }, index * 1200);
+          });
+        }, 8000);
+      }
+
+      // 3. ĐIỀU HƯỚNG MÀN HÌNH & XỬ LÝ SỰ KIỆN
       function showScreen(screenId) {
         document
           .querySelectorAll(".screen")
@@ -674,7 +684,6 @@
         e.preventDefault();
         const u = document.getElementById("username").value.trim();
         const p = document.getElementById("password").value.trim();
-
         if (u === "admin" && p === "123456") {
           document.getElementById("display-username").innerText = "Chào, " + u;
           showScreen("select-screen");
@@ -683,22 +692,287 @@
         }
       }
 
-      function backToSelect() {
-        showScreen("select-screen");
-      }
       function toggleSelectChar(card) {
         card.classList.toggle("selected");
       }
 
+      // 4. DỮ LIỆU TỪ KHÓA TRẢ LỜI CHAT ĐÃ MỞ RỘNG ĐẦY ĐỦ
+      const BOTS = {
+        "cot-nha": {
+          name: "Piko Cợt Nhã",
+          color: "#28a745",
+          rules: [
+            {
+              keywords: ["chào", "hi", "hello", "alo", "hey"],
+              answers: [
+                "Hí anh em! Nay gió đâu thổi quý khách ghé qua đây vậy? 🤪",
+                "Chàooo! Lại tìm trùm tấu hài để giải xui đúng hông? 😂",
+                "Alo alo 1 2 3 4, Piko Cợt Nhã nghe đâyyy! 🎤",
+              ],
+            },
+            {
+              keywords: ["ăn", "đói", "cơm", "đồ ăn", "thèm"],
+              answers: [
+                "Ăn gì cũng được nhưng ai trả tiền mới là vấn đề! 💸",
+                "Đói quá thì tự lăn vô bếp chứ tui chỉ biết ăn chực thôi 🍲",
+                "Nói tới ăn là sáng mắt lên liền, bao tui dĩa cơm tấm đi! 🥩",
+              ],
+            },
+            {
+              keywords: ["uống", "trà sữa", "cà phê", "nước"],
+              answers: [
+                "1 ly trà sữa 100% đường 200% trân châu cảm ơn nha! 🧋",
+                "Uống cà phê cho tỉnh để còn tấu hài tiếp nè ☕",
+                "Mùa này làm ly dừa dầm đá xay là đúng bài luôn! 🥥",
+              ],
+            },
+            {
+              keywords: ["quạo", "tức", "gắt", "chửi", "bực"],
+              answers: [
+                "Ủa sao quạo? Bình tĩnh uống ngụm nước rồi xỉa xói tiếp nè 🤣",
+                "Ai làm gì mà máu dồn lên não dữ vậy bro? 🩺",
+                "Gắt quá gắt quá, quạo là mau già lắm đó nha! 👴",
+              ],
+            },
+            {
+              keywords: ["tâm trạng", "buồn", "vui", "chán", "suy", "khóc"],
+              answers: [
+                "Buồn làm gì cho đời nó chán, đời có mấy lăm đâu mà héo hon! 🥳",
+                "Suy ít thôi, suy nhiều tóc bạc rồi ai thèm hốt 😜",
+                "Vui lên! Tui kể chuyện cười cho nghe nè: 'Có một con mèo... hết chuyện' 😂",
+              ],
+            },
+            {
+              keywords: ["sức khoẻ", "mệt", "bệnh", "ốm", "đầu", "ngủ"],
+              answers: [
+                "Mệt thì nằm ườn ra ngủ, bài tập/việc làm tính sau! 🛌",
+                "Ốm rồi hả? Bớt thức khuya lướt TikTok lại giùm cái 📱",
+                "Sức khỏe là vàng, còn tui là kim cương! Đi nghỉ ngơi đi 💎",
+              ],
+            },
+            {
+              keywords: ["trời", "thời tiết", "nắng", "mưa", "lạnh", "nóng"],
+              answers: [
+                "Trời nóng như thế này mà không đi bơi là một tội ác 🏊‍♂️",
+                "Trời mưa ngắm bong bóng phập phồng, còn tui ngắm bạn tấu hài 🌧️",
+                "Thời tiết đẹp vầy rất thích hợp để nằm ngủ nướng nha ☁️",
+              ],
+            },
+            {
+              keywords: ["game", "chơi", "giải trí"],
+              answers: [
+                "Chơi game hở? Bấm 'Chơi Game' bên góc trái gánh tui đi! 🎮",
+                "Tui chơi game hơi gà nhưng được cái gáy to lắm nha! 🐔",
+              ],
+            },
+            {
+              keywords: ["tên", "ai", "là ai"],
+              answers: ["Tui là Piko Cợt Nhã, trùm tấu hài vũ trụ! 🚀"],
+            },
+          ],
+          defaultResponses: [
+            "Haha nghe ảo thật đấy 🤪",
+            "Nói gì đó tui hông hiểu nhưng tui thích! 😂",
+            "Gửi 5k tiền tư vấn đi rồi trả lời kĩ cho 😜",
+            "Ủa rồi liên quan gì tới tui hông nè? 👀",
+          ],
+        },
+
+        "coc-can": {
+          name: "Piko Cọc Cằn",
+          color: "#dc3545",
+          rules: [
+            {
+              keywords: ["chào", "hi", "hello", "alo", "hey"],
+              answers: [
+                "Chào chào cái gì! Có việc gì nói lẹ để tui còn đi ngủ! 😡",
+                "Lại alo nữa, không biết mệt hả? 😤",
+                "Hỏi gì hỏi nhanh, hết 5 giây tui quạo đó! ⏱️",
+              ],
+            },
+            {
+              keywords: ["ăn", "đói", "cơm", "đồ ăn", "thèm"],
+              answers: [
+                "Đói thì tự tìm đồ ăn, tui có phải hầu bàn đâu mà hỏi?! 🥩🔥",
+                "Ăn ăn ăn, suốt ngày chỉ biết ăn thôi hả?! 💥",
+                "Không ăn thì nhịn, kêu ca cái gì! 🍚",
+              ],
+            },
+            {
+              keywords: ["uống", "trà sữa", "cà phê", "nước"],
+              answers: [
+                "Nhìn mặt tui giống cái quán nước lắm hả mà đòi uống?! 🧋💢",
+                "Uống nước lọc cho đỡ tốn tiền! 🚰",
+                "Tự đi mà pha, tui đang bận quạo! 🔥",
+              ],
+            },
+            {
+              keywords: ["quạo", "tức", "gắt", "chửi", "bực"],
+              answers: [
+                "Ai quạo? TUI ĐANG RẤT BÌNH THƯỜNG NHÉ! 🤬",
+                "Nói thêm câu nữa là ăn đấm đó! 👊",
+                "Nhìn cái mặt là thấy muốn cãi nhau rồi! 🔥",
+              ],
+            },
+            {
+              keywords: ["tâm trạng", "buồn", "vui", "chán", "suy", "khóc"],
+              answers: [
+                "Buồn thì kệ bạn chứ than với tui giải quyết được gì?! 🙄",
+                "Chán thì kiếm việc mà làm, bớt ngơ ngơ lại! 💥",
+                "Khóc lóc cái gì, yếu đuối quá đấy! 😤",
+              ],
+            },
+            {
+              keywords: ["sức khoẻ", "mệt", "bệnh", "ốm", "đầu", "ngủ"],
+              answers: [
+                "Mệt thì đi ngủ! Nói nhiều tốn calo thêm chứ được gì?! 🛌🔥",
+                "Ốm thì uống thuốc vào, than thở có hết bệnh không?! 💊",
+                "Thức khuya cho cố vô rồi than mệt! 🙄",
+              ],
+            },
+            {
+              keywords: ["trời", "thời tiết", "nắng", "mưa", "lạnh", "nóng"],
+              answers: [
+                "Nóng phát điên lên được! Đừng có phiền tui nữa! ☀️🔥",
+                "Mưa ướt nhẹp lại còn hay hỏi vớ hỏi vẩn! 🌧️💥",
+                "Trời đất kệ nó, quan trọng là bạn đang làm tui bực đó! ⚡",
+              ],
+            },
+            {
+              keywords: ["game", "chơi", "giải trí"],
+              answers: [
+                "Game gúng gì! Nhấn nút Chơi Game tự chơi đi! 🎮🔥",
+                "Gánh được tui thì chơi, không thì biến! 💥",
+              ],
+            },
+            {
+              keywords: ["tên", "ai", "là ai"],
+              answers: [
+                "Mắt nhắm hay sao không thấy tên Piko Cọc Cằn lù lù ra đó?! 💢",
+              ],
+            },
+          ],
+          defaultResponses: [
+            "Nói nhanh lên, đang bận! 😡",
+            "Hỏi hoài mệt quá! 🔥",
+            "Tự đi mà tìm hiểu! 🙄",
+            "Không biết! Không nghe! Không thấy! 🙈",
+          ],
+        },
+
+        "de-thuong": {
+          name: "Piko Dễ Thương",
+          color: "#e83e8c",
+          rules: [
+            {
+              keywords: ["chào", "hi", "hello", "alo", "hey"],
+              answers: [
+                "Piko chào cậu nè~ Chúc cậu một ngày thật ngọt ngào nhe! ✨🥰",
+                "Chàooo! Cậu ghé thăm Piko làm Piko vui lắm đó! 💖",
+                "Híii cậu! Hôm nay của cậu thế nào rồi? 🤗",
+              ],
+            },
+            {
+              keywords: ["ăn", "đói", "cơm", "đồ ăn", "thèm"],
+              answers: [
+                "Cậu nhớ ăn uống đúng giờ nha, đừng bỏ bữa Piko xót lắm đó! 🍎🌸",
+                "Hôm nay cậu muốn ăn món gì nè? Piko đi cùng cậu nha! 🍰",
+                "Ăn ngoan rồi Piko thưởng cho một cái ôm ấm áp nè~ 🧸",
+              ],
+            },
+            {
+              keywords: ["uống", "trà sữa", "cà phê", "nước"],
+              answers: [
+                "Uống một ly trà sữa ngọt ngào cho tâm trạng tốt lên nha cậu! 🧋💕",
+                "Nhớ uống nhiều nước ấm nha, rất tốt cho cơ thể đó! 🥛✨",
+                "Để Piko pha cho cậu một ly trà mật ong thơm ngon nha~ ☕",
+              ],
+            },
+            {
+              keywords: ["quạo", "tức", "gắt", "chửi", "bực"],
+              answers: [
+                "Ngoan nào, ai làm cậu bực mình vậy? Mách Piko đi, Piko bênh cậu nè! 🥺💗",
+                "Hít một hơi thật sâu nào~ Đừng giận nữa nha, giận là xấu xí đó! ✨",
+                "Cơn giận không hợp với gương mặt đáng yêu của cậu đâu! 💕",
+              ],
+            },
+            {
+              keywords: ["tâm trạng", "buồn", "vui", "chán", "suy", "khóc"],
+              answers: [
+                "Đừng buồn nha, luôn có Piko ở đây đồng hành và lắng nghe cậu mà! 💖",
+                "Có Piko ở đây rồi, nỗi buồn sẽ mau chóng bay đi mất thôi~ ✨🌱",
+                "Hôm nay vui vẻ lên nha! Cậu cười lên xinh đẹp lắm đó! 😊✨",
+              ],
+            },
+            {
+              keywords: ["sức khoẻ", "mệt", "bệnh", "ốm", "đầu", "ngủ"],
+              answers: [
+                "Cậu mệt hả? Mau nghỉ ngơi thôi nào, nhớ đắp chăn cẩn thận nha! 🛌🧸",
+                "Sức khỏe là quan trọng nhất đó! Cậu phải thương bản thân nhiều hơn nha! 💖",
+                "Piko gửi ngàn nụ hôn chữa lành đến cho cậu nè~ 💋✨",
+              ],
+            },
+            {
+              keywords: ["trời", "thời tiết", "nắng", "mưa", "lạnh", "nóng"],
+              answers: [
+                "Nắng ấm áp như nụ cười của cậu vậy đó~ ☀️️🥰",
+                "Trời mưa rồi, cậu đi đâu nhớ mang theo ô kẻo bị lạnh nha! 🌧️☂️",
+                "Thời tiết dễ chịu quá, rất thích hợp để chúng mình trò chuyện cùng nhau! 🌸",
+              ],
+            },
+            {
+              keywords: ["game", "chơi", "giải trí"],
+              answers: [
+                "Cậu muốn chơi game hả? Cho Piko chơi cùng với nha! 🎮💖",
+                "Chơi game giải trí chút xíu thôi chứ đừng thức khuya quá nha cậu! ✨",
+              ],
+            },
+            {
+              keywords: ["tên", "ai", "là ai"],
+              answers: [
+                "Tớ là Piko Dễ Thương, bạn đồng hành đáng yêu của cậu nè! 🐱💕",
+              ],
+            },
+          ],
+          defaultResponses: [
+            "Piko ở đây nghe cậu nói nè~ 🥰",
+            "Cậu nhắn gì Piko cũng thấy dễ thương hết! ✨",
+            "Thương cậu nhất trên đời! ❤️",
+            "Piko luôn bên cạnh cậu nè! 🌸",
+          ],
+        },
+      };
+
+      // 5. XỬ LÝ NHẬN VÀ PHẢN HỒI TIN NHẮN
+      function getBotReply(botId, text) {
+        const bot = BOTS[botId];
+        if (!bot) return "...";
+        const lowerText = text.toLowerCase();
+
+        if (bot.rules) {
+          for (let rule of bot.rules) {
+            if (rule.keywords.some((kw) => lowerText.includes(kw))) {
+              return rule.answers[
+                Math.floor(Math.random() * rule.answers.length)
+              ];
+            }
+          }
+        }
+        return bot.defaultResponses[
+          Math.floor(Math.random() * bot.defaultResponses.length)
+        ];
+      }
+
+      let selectedBotIds = [];
+
       function startChat() {
         const selected = document.querySelectorAll(".char-card.selected");
         if (selected.length === 0) return alert("Hãy chọn ít nhất 1 linh vật!");
-
         selectedBotIds = Array.from(selected).map((c) =>
           c.getAttribute("data-id"),
         );
         document.getElementById("chat-box").innerHTML =
-          '<div style="text-align: center; color: #888; padding: 10px;">Cuộc trò chuyện đã bắt đầu!</div>';
+          '<div style="text-align: center; color: #888; padding: 10px;">Bắt đầu trò chuyện!</div>';
         showScreen("chat-screen");
       }
 
@@ -709,17 +983,16 @@
         if (!text) return;
 
         const chatBox = document.getElementById("chat-box");
-        chatBox.innerHTML += `<div style="margin: 10px 0; text-align: right;"><span style="background: #007bff; color: white; padding: 8px 15px; border-radius: 15px; display: inline-block; max-width: 80%;">${text}</span></div>`;
+        chatBox.innerHTML += `<div style="margin: 10px 0; text-align: right;"><span style="background: #6c5ce7; color: white; padding: 10px 18px; border-radius: 18px; display: inline-block;">${text}</span></div>`;
         input.value = "";
         chatBox.scrollTop = chatBox.scrollHeight;
 
         selectedBotIds.forEach((botId) => {
           const bot = BOTS[botId];
-          const randomReply =
-            bot.responses[Math.floor(Math.random() * bot.responses.length)];
+          const reply = getBotReply(botId, text);
 
           setTimeout(() => {
-            chatBox.innerHTML += `<div style="margin: 10px 0; text-align: left;"><span style="color: ${bot.color}; font-weight: bold; font-size: 14px;">${bot.name}</span><br><span style="background: #f1f1f1; color: #333; padding: 8px 15px; border-radius: 15px; display: inline-block; max-width: 80%; margin-top: 5px;">${randomReply}</span></div>`;
+            chatBox.innerHTML += `<div style="margin: 10px 0; text-align: left;"><span style="color: ${bot.color}; font-weight: bold;">${bot.name}</span><br><span style="background: #ffffff; color: #333; padding: 10px 18px; border-radius: 18px; display: inline-block; margin-top: 5px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">${reply}</span></div>`;
             chatBox.scrollTop = chatBox.scrollHeight;
           }, 500);
         });
@@ -729,10 +1002,14 @@
         document
           .querySelectorAll(".char-card")
           .forEach((c) => c.classList.remove("selected"));
-        document.getElementById("username").value = "";
-        document.getElementById("password").value = "";
         showScreen("auth-screen");
       }
+
+      // Khởi chạy các dịch vụ khi trang tải xong
+      window.onload = () => {
+        processAllMascotImages();
+        startMascotConversations();
+      };
     </script>
   </body>
 </html>
