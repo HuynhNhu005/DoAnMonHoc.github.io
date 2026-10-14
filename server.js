@@ -1,67 +1,47 @@
-require("dotenv").config();
 const express = require("express");
-const sql = require("mssql");
 const cors = require("cors");
+const db = require("./db"); // Gọi file kết nối DB ở Bước 1 vào
 
 const app = express();
-app.use(express.json());
 app.use(cors());
+app.use(express.json());
 
-// 1. Cấu hình kết nối SQL Server Express
-const dbConfig = {
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  server: process.env.DB_SERVER,
-  database: process.env.DB_DATABASE,
-  options: {
-    instanceName: process.env.DB_INSTANCE, // SQLEXPRESS03
-    encrypt: false,
-    trustServerCertificate: true,
-  },
-};
-
-// 2. Hàm kết nối CSDL
-async function connectDB() {
-  try {
-    await sql.connect(dbConfig);
-    console.log("✅ Đã kết nối thành công tới SQL Server!");
-  } catch (err) {
-    console.error("❌ Lỗi kết nối SQL Server:", err.message);
-  }
-}
-
-// 3. API Lấy danh sách người dùng
-app.get("/api/users", async (req, res) => {
-  try {
-    const result = await sql.query("SELECT id, username, createdAt FROM Users");
-    res.json({ success: true, data: result.recordset });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
+// 1. Nơi kiểm tra xem server có sống không
+app.get("/", (req, res) => {
+  res.send("🚀 Server Backend PikoChat đang hoạt động cực kỳ mượt mà!");
 });
 
-// 4. API Thêm người dùng mới
-app.post("/api/users", async (req, res) => {
-  try {
-    const { username, password } = req.body;
-    const request = new sql.Request();
-    request.input("username", sql.NVarChar, username);
-    request.input("password", sql.VarChar, password);
-
-    await request.query(`
-      INSERT INTO Users (username, password) 
-      VALUES (@username, @password)
-    `);
-
-    res.json({ success: true, message: "Thêm người dùng thành công!" });
-  } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
-  }
+// 2. Viết API lấy thử danh sách tài khoản từ bảng USER lên
+app.get("/api/test-users", (req, res) => {
+  const query = "SELECT user_id, email, role, full_name FROM USER";
+  db.query(query, (err, results) => {
+    if (err) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
+    res.json({ success: true, data: results });
+  });
 });
 
-// 5. Khởi chạy Server
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, async () => {
-  await connectDB();
-  console.log(`🚀 Server đang chạy tại: http://localhost:${PORT}`);
+// API KIỂM TRA ĐĂNG NHẬP
+app.post("/api/login", (req, res) => {
+  const { username, password } = req.body;
+
+  // Tìm trong database xem có email và pass này không
+  const query = "SELECT * FROM USER WHERE email = ? AND password_hash = ?";
+
+  db.query(query, [username, password], (err, results) => {
+    if (err)
+      return res.status(500).json({ success: false, message: "Lỗi server" });
+
+    if (results.length > 0) {
+      res.json({ success: true, user: results[0] }); // Trả về thông tin user thật
+    } else {
+      res.json({ success: false, message: "Sai tài khoản hoặc mật khẩu!" });
+    }
+  });
+});
+// Bật máy chủ ở cổng 3000
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(`🚀 Máy chủ đang chạy tại: http://localhost:${PORT}`);
 });
