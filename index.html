@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PikoChat - Trò Chuyện Cùng Linh Vật</title>
+    <title>PikoChat - Trò Chuyện Cùng Linh Vật PIKO</title>
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
@@ -12,7 +12,7 @@
     <style>
       :root {
         --primary-bg: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
-        --card-bg: rgba(255, 255, 255, 0.92);
+        --card-bg: rgba(255, 255, 255, 0.95);
         --accent-color: #6c5ce7;
       }
 
@@ -25,7 +25,30 @@
         overflow-x: hidden;
       }
 
-      /* 3 LINH VẬT DI CHUYỂN BAN ĐẦU */
+      /* QUY ĐỊNH XÓA NỀN CHO TẤT CẢ HÌNH ẢNH LINH VẬT */
+      img {
+        mix-blend-mode: multiply !important;
+        background: transparent !important;
+        border: none !important;
+        outline: none !important;
+        box-shadow: none !important;
+      }
+
+      /* BANNER THÔNG BÁO TỪ ADMIN */
+      #global-announcement-bar {
+        background: linear-gradient(135deg, #ff7675, #d63031);
+        color: white;
+        padding: 10px 20px;
+        text-align: center;
+        font-weight: bold;
+        font-size: 14px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+        display: none;
+        position: relative;
+        z-index: 10000;
+      }
+
+      /* 3 LINH VẬT DI CHUYỂN */
       #running-mascots {
         position: fixed;
         top: 0;
@@ -42,16 +65,19 @@
         pointer-events: auto;
         cursor: grab;
         transition: transform 0.3s ease;
+        background: transparent !important;
+      }
+
+      .mascot-wrapper:hover {
+        transform: scale(1.15) !important;
       }
 
       .run-mascot {
         width: 100%;
         height: auto;
         object-fit: contain;
-        mix-blend-mode: multiply !important;
       }
 
-      /* BÓNG THOẠI HỘI THOẠI */
       .mascot-bubble {
         position: absolute;
         top: -50px;
@@ -90,7 +116,6 @@
         transform: translateX(-50%) scale(1) translateY(-8px);
       }
 
-      /* QUY ĐẠO DI CHUYỂN */
       .mascot-1 {
         animation: walkAround1 26s ease-in-out infinite alternate;
       }
@@ -169,7 +194,8 @@
 
       .auth-container,
       .select-container,
-      .chat-container {
+      .chat-container,
+      .admin-container {
         background: var(--card-bg);
         backdrop-filter: blur(15px);
         border-radius: 24px;
@@ -197,7 +223,6 @@
       .auth-banner img {
         width: 130px;
         margin-bottom: 15px;
-        mix-blend-mode: multiply;
       }
       .auth-form-box {
         padding: 40px;
@@ -237,7 +262,6 @@
         width: 100px;
         height: 100px;
         object-fit: contain;
-        mix-blend-mode: multiply;
       }
 
       .btn-submit {
@@ -314,7 +338,6 @@
         width: 48px;
         height: 48px;
         object-fit: contain;
-        mix-blend-mode: multiply;
       }
       .bot-info {
         flex: 1;
@@ -361,7 +384,6 @@
         width: 40px;
         height: 40px;
         object-fit: contain;
-        mix-blend-mode: multiply;
       }
       .chat-box {
         flex: 1;
@@ -389,6 +411,74 @@
         padding: 0 25px;
         border-radius: 25px;
         cursor: pointer;
+        font-weight: bold;
+      }
+
+      /* BẢNG ĐIỀU KHIỂN ADMIN DASHBOARD */
+      .admin-container {
+        width: 1000px;
+        height: 650px;
+        display: flex;
+      }
+      .admin-sidebar {
+        width: 250px;
+        background: #2d3436;
+        color: white;
+        padding: 25px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .admin-nav-btn {
+        background: #3a4042;
+        color: white;
+        border: none;
+        padding: 12px 15px;
+        border-radius: 12px;
+        text-align: left;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .admin-nav-btn:hover,
+      .admin-nav-btn.active {
+        background: #6c5ce7;
+      }
+      .admin-content {
+        flex: 1;
+        padding: 30px;
+        overflow-y: auto;
+        background: #f8f9fa;
+      }
+      .admin-panel {
+        display: none;
+      }
+      .admin-panel.active {
+        display: block;
+      }
+
+      .admin-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        margin-top: 15px;
+      }
+      .admin-table th,
+      .admin-table td {
+        padding: 12px 16px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+        font-size: 14px;
+      }
+      .admin-table th {
+        background: #e8e5ff;
+        color: #6c5ce7;
         font-weight: bold;
       }
 
@@ -469,7 +559,8 @@
         color: #636e72;
         font-size: 14px;
       }
-      .input-group input {
+      .input-group input,
+      .input-group textarea {
         width: 100%;
         padding: 12px;
         border: 2px solid #dfe6e9;
@@ -490,6 +581,14 @@
     </style>
   </head>
   <body>
+    <!-- THÔNG BÁO TỪ ADMIN -->
+    <div id="global-announcement-bar">
+      📢
+      <span id="global-announcement-text"
+        >Thông báo từ Quản trị viên PikoChat</span
+      >
+    </div>
+
     <!-- 3 LINH VẬT ĐI VÒNG VÒNG NÓI CHUYỆN QUA LẠI -->
     <div id="running-mascots">
       <div id="m1" class="mascot-wrapper mascot-1">
@@ -536,7 +635,7 @@
             "
           />
           <h1>PikoChat</h1>
-          <p>Tương tác vui vẻ cùng dàn linh vật Piko!</p>
+          <p>Tương tác vui vẻ cùng các linh vật Piko!</p>
         </div>
         <div class="auth-form-box">
           <div id="login-box">
@@ -650,7 +749,7 @@
     <div id="select-screen" class="screen">
       <div class="select-container">
         <h2 style="color: #2d3436; font-size: 26px; margin-bottom: 5px">
-          Chọn Linh Vật Trò Chuyện
+          Hãy Chọn Linh Vật Trò Chuyện với bạn
         </h2>
         <p style="color: #636e72; margin-top: 0">
           Hãy chọn 1 nhân vật bạn thích nhất để bắt đầu trò chuyện nhé!
@@ -818,6 +917,161 @@
       </div>
     </div>
 
+    <!-- MÀN HÌNH QUẢN TRỊ VIÊN (ADMIN DASHBOARD) -->
+    <div id="admin-screen" class="screen">
+      <div class="admin-container">
+        <div class="admin-sidebar">
+          <h2 style="font-size: 18px; margin: 0 0 15px 0; color: #ffeaa7">
+            🛠️ Admin Control
+          </h2>
+          <button
+            class="admin-nav-btn active"
+            onclick="switchAdminTab('leaderboard', this)"
+          >
+            🏆 BXH EXP Khách
+          </button>
+          <button class="admin-nav-btn" onclick="switchAdminTab('users', this)">
+            👥 Danh Sách Account
+          </button>
+          <button class="admin-nav-btn" onclick="switchAdminTab('logs', this)">
+            📜 Lịch Sử Truy Cập
+          </button>
+          <button
+            class="admin-nav-btn"
+            onclick="switchAdminTab('announcement', this)"
+          >
+            📢 Đăng Thông Báo
+          </button>
+
+          <button
+            class="btn-submit"
+            style="background: #ff7675; margin-top: auto"
+            onclick="logout()"
+          >
+            Đăng Xuất Admin
+          </button>
+        </div>
+
+        <div class="admin-content">
+          <!-- TAB 1: BẢNG XẾP HẠNG KHÁCH HÀNG -->
+          <div id="panel-leaderboard" class="admin-panel active">
+            <h3 style="margin-top: 0; color: #2d3436">
+              🏆 Bảng Xếp Hạng EXP Đang Dẫn Đầu
+            </h3>
+            <p style="color: #636e72; font-size: 13px">
+              Thống kê xếp hạng người dùng tương tác nhiều nhất với các linh vật
+              Piko.
+            </p>
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Hạng</th>
+                  <th>Tài Khoản</th>
+                  <th>Tổng EXP</th>
+                  <th>Danh Hiệu</th>
+                </tr>
+              </thead>
+              <tbody id="leaderboard-table-body"></tbody>
+            </table>
+          </div>
+
+          <!-- TAB 2: QUẢN LÝ CÁC ACC ĐÃ TẠO -->
+          <div id="panel-users" class="admin-panel">
+            <h3 style="margin-top: 0; color: #2d3436">
+              👥 Danh Sách Tài Khoản Đã Đăng Ký
+            </h3>
+            <p style="color: #636e72; font-size: 13px">
+              Quản lý toàn bộ thông tin các tài khoản khách hàng đã tạo trên hệ
+              thống.
+            </p>
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>STT</th>
+                  <th>Tên Tài Khoản</th>
+                  <th>Mật Khẩu</th>
+                  <th>Hành Động</th>
+                </tr>
+              </thead>
+              <tbody id="users-table-body"></tbody>
+            </table>
+          </div>
+
+          <!-- TAB 3: LỊCH SỬ TRUY CẬP CỦA KHÁCH -->
+          <div id="panel-logs" class="admin-panel">
+            <div
+              style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+              "
+            >
+              <h3 style="margin-top: 0; color: #2d3436">
+                📜 Lịch Sử Truy Cập Của Khách
+              </h3>
+              <button
+                class="btn-submit"
+                style="background: #d63031; padding: 6px 12px; font-size: 12px"
+                onclick="clearAccessLogs()"
+              >
+                Xóa Lịch Sử
+              </button>
+            </div>
+            <p style="color: #636e72; font-size: 13px">
+              Theo dõi thời gian và hành vi truy cập hệ thống của từng tài
+              khoản.
+            </p>
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Thời Gian</th>
+                  <th>Tài Khoản</th>
+                  <th>Hành Động</th>
+                </tr>
+              </thead>
+              <tbody id="logs-table-body"></tbody>
+            </table>
+          </div>
+
+          <!-- TAB 4: THÔNG BÁO TOÀN HỆ THỐNG -->
+          <div id="panel-announcement" class="admin-panel">
+            <h3 style="margin-top: 0; color: #2d3436">
+              📢 Phát Thông Báo Cho Khách Hàng
+            </h3>
+            <p style="color: #636e72; font-size: 13px">
+              Nội dung này sẽ hiển thị thanh Banner thông báo phía trên cùng màn
+              hình người dùng.
+            </p>
+
+            <div class="input-group">
+              <label>Nội dung thông báo:</label>
+              <textarea
+                id="admin-announcement-input"
+                rows="4"
+                placeholder="Nhập nội dung thông báo cho tất cả người dùng..."
+              ></textarea>
+            </div>
+            <div style="display: flex; gap: 10px">
+              <button
+                class="btn-submit"
+                style="background: #00b894"
+                onclick="saveAnnouncement()"
+              >
+                🚀 Đăng Thông Báo
+              </button>
+              <button
+                class="btn-submit"
+                style="background: #d63031"
+                onclick="clearAnnouncement()"
+              >
+                ✖ Gỡ Thông Báo
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- POPUP TÌM KIẾM LỊCH SỬ CHAT -->
     <div class="modal-overlay" id="history-modal">
       <div class="history-modal">
@@ -864,7 +1118,52 @@
       let activeBotId = "cot-nha";
       let isSpeechEnabled = true;
 
-      /* 1. HỘI THOẠI XOAY VÒNG GIỮA 3 LINH VẬT */
+      /* ===================================================
+         1. HÀM XỬ LÝ CANVAS TỰ ĐỘNG XÓA NỀN TRẮNG HÌNH ẢNH
+      =================================================== */
+      function makeImageTransparent(imgEl) {
+        if (!imgEl) return;
+        const process = () => {
+          try {
+            if (imgEl.dataset.processed === "true") return;
+            const canvas = document.createElement("canvas");
+            const ctx = canvas.getContext("2d");
+            canvas.width = imgEl.naturalWidth || imgEl.width;
+            canvas.height = imgEl.naturalHeight || imgEl.height;
+            if (!canvas.width || !canvas.height) return;
+
+            ctx.drawImage(imgEl, 0, 0);
+            const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const data = imgData.data;
+
+            for (let i = 0; i < data.length; i += 4) {
+              if (data[i] > 210 && data[i + 1] > 210 && data[i + 2] > 210) {
+                data[i + 3] = 0;
+              }
+            }
+            ctx.putImageData(imgData, 0, 0);
+            imgEl.dataset.processed = "true";
+            imgEl.src = canvas.toDataURL("image/png");
+          } catch (e) {}
+        };
+
+        if (imgEl.complete && imgEl.naturalWidth > 0) process();
+        else imgEl.addEventListener("load", process, { once: true });
+      }
+
+      function processAllImages() {
+        document
+          .querySelectorAll("img")
+          .forEach((img) => makeImageTransparent(img));
+      }
+      window.addEventListener("DOMContentLoaded", () => {
+        processAllImages();
+        checkGlobalAnnouncement();
+      });
+
+      /* ===================================================
+         2. HỘI THOẠI ROTATING MASCOTS
+      =================================================== */
       const mascotScript = [
         { bot: "m1", text: "Hí hai anh em! Nắng đẹp thế này đi chơi hông? ☀️" },
         { bot: "m2", text: "Đi cái gì mà đi, mệt muốn chết đây này! 😡" },
@@ -899,7 +1198,9 @@
       setInterval(runMascotConversation, 3200);
       runMascotConversation();
 
-      /* 2. CẤU HÌNH BOT */
+      /* ===================================================
+         3. LOGIC AUTH & LỊCH SỬ TRUY CẬP (LOGS)
+      =================================================== */
       const BOTS = {
         "cot-nha": {
           name: "Piko Cợt Nhã",
@@ -927,6 +1228,15 @@
         { maxExp: 250, title: "⭐ Bạn Thân" },
         { maxExp: 500, title: "💖 Tri Kỷ" },
       ];
+
+      function logAccess(user, action) {
+        const logs = JSON.parse(
+          localStorage.getItem("piko_access_logs") || "[]",
+        );
+        const timeStr = new Date().toLocaleString("vi-VN");
+        logs.unshift({ time: timeStr, user: user, action: action });
+        localStorage.setItem("piko_access_logs", JSON.stringify(logs));
+      }
 
       function toggleAuthMode(mode) {
         if (mode === "register") {
@@ -956,6 +1266,7 @@
 
         users[u] = p;
         localStorage.setItem("piko_users", JSON.stringify(users));
+        logAccess(u, "Đăng ký tài khoản mới");
         alert("Đăng ký thành công!");
 
         document.getElementById("username").value = u;
@@ -969,10 +1280,16 @@
         const p = document.getElementById("password").value.trim();
         const users = getUsersFromStorage();
 
-        if ((u === "admin" && p === "123456") || (users[u] && users[u] === p)) {
+        if (u === "admin" && p === "123456") {
+          currentUser = "admin";
+          logAccess("admin", "Đăng nhập vào trang Quản trị");
+          showScreen("admin-screen");
+          loadAdminData();
+        } else if (users[u] && users[u] === p) {
           currentUser = u;
           document.getElementById("display-username").innerText =
             "👤 " + currentUser;
+          logAccess(u, "Đăng nhập thành công");
           showScreen("select-screen");
         } else {
           alert("Sai tài khoản hoặc mật khẩu!");
@@ -985,15 +1302,177 @@
           .forEach((s) => s.classList.remove("active"));
         document.getElementById(id).classList.add("active");
 
-        // Ẩn 3 linh vật khi vào màn hình Chat để không che giao diện
         const runningMascots = document.getElementById("running-mascots");
-        if (id === "chat-screen") {
+        if (id === "chat-screen" || id === "admin-screen") {
           runningMascots.style.display = "none";
         } else {
           runningMascots.style.display = "block";
         }
+        setTimeout(processAllImages, 50);
       }
 
+      /* ===================================================
+         4. LOGIC HỆ THỐNG QUẢN TRỊ ADMIN DASHBOARD
+      =================================================== */
+      function switchAdminTab(panelId, btnEl) {
+        document
+          .querySelectorAll(".admin-panel")
+          .forEach((p) => p.classList.remove("active"));
+        document
+          .querySelectorAll(".admin-nav-btn")
+          .forEach((b) => b.classList.remove("active"));
+
+        document.getElementById("panel-" + panelId).classList.add("active");
+        if (btnEl) btnEl.classList.add("active");
+
+        loadAdminData();
+      }
+
+      function loadAdminData() {
+        // 1. Tải Bảng Xếp Hạng (Leaderboard)
+        const users = getUsersFromStorage();
+        let leaderboard = [];
+
+        Object.keys(users).forEach((u) => {
+          const affinity = JSON.parse(
+            localStorage.getItem(`piko_affinity_${u}`) ||
+              '{"cot-nha":0,"coc-can":0,"de-thuong":0}',
+          );
+          const totalExp =
+            (affinity["cot-nha"] || 0) +
+            (affinity["coc-can"] || 0) +
+            (affinity["de-thuong"] || 0);
+
+          let title = "🌱 Người Lạ";
+          if (totalExp > 300) title = "💖 Tri Kỷ Piko";
+          else if (totalExp > 150) title = "⭐ Bạn Thân";
+          else if (totalExp > 50) title = "💬 Bạn Quen";
+
+          leaderboard.push({ user: u, exp: totalExp, title: title });
+        });
+
+        // Sắp xếp giảm dần theo EXP
+        leaderboard.sort((a, b) => b.exp - a.exp);
+
+        const lbBody = document.getElementById("leaderboard-table-body");
+        lbBody.innerHTML = leaderboard.length
+          ? ""
+          : "<tr><td colspan='4' style='text-align:center;'>Chưa có dữ liệu khách hàng</td></tr>";
+
+        leaderboard.forEach((item, idx) => {
+          let rankIcon =
+            idx === 0
+              ? "🥇"
+              : idx === 1
+                ? "🥈"
+                : idx === 2
+                  ? "🥉"
+                  : `#${idx + 1}`;
+          lbBody.innerHTML += `
+            <tr>
+              <td><strong>${rankIcon}</strong></td>
+              <td style="font-weight:bold; color:#6c5ce7;">${item.user}</td>
+              <td><span style="background:#fdcb6e; padding:4px 8px; border-radius:10px; font-weight:bold;">${item.exp} EXP</span></td>
+              <td>${item.title}</td>
+            </tr>
+          `;
+        });
+
+        // 2. Tải Danh Sách Account
+        const usersBody = document.getElementById("users-table-body");
+        usersBody.innerHTML = Object.keys(users).length
+          ? ""
+          : "<tr><td colspan='4' style='text-align:center;'>Chưa có account nào được tạo</td></tr>";
+
+        let index = 1;
+        Object.keys(users).forEach((u) => {
+          usersBody.innerHTML += `
+            <tr>
+              <td>${index++}</td>
+              <td style="font-weight:bold;">${u}</td>
+              <td><code>${users[u]}</code></td>
+              <td><button style="background:#ff7675; color:white; border:none; padding:4px 10px; border-radius:6px; cursor:pointer;" onclick="deleteUserAccount('${u}')">Xóa Acc</button></td>
+            </tr>
+          `;
+        });
+
+        // 3. Tải Lịch Sử Truy Cập
+        const logs = JSON.parse(
+          localStorage.getItem("piko_access_logs") || "[]",
+        );
+        const logsBody = document.getElementById("logs-table-body");
+        logsBody.innerHTML = logs.length
+          ? ""
+          : "<tr><td colspan='3' style='text-align:center;'>Chưa có lịch sử truy cập</td></tr>";
+
+        logs.forEach((log) => {
+          logsBody.innerHTML += `
+            <tr>
+              <td style="font-size:12px; color:#888;">${log.time}</td>
+              <td style="font-weight:bold; color:#00b894;">${log.user}</td>
+              <td>${log.action}</td>
+            </tr>
+          `;
+        });
+
+        // 4. Tải Thông Báo
+        const currentNotice =
+          localStorage.getItem("piko_global_announcement") || "";
+        document.getElementById("admin-announcement-input").value =
+          currentNotice;
+      }
+
+      function deleteUserAccount(username) {
+        if (confirm(`Bạn có chắc muốn xóa tài khoản "${username}"?`)) {
+          const users = getUsersFromStorage();
+          delete users[username];
+          localStorage.setItem("piko_users", JSON.stringify(users));
+          logAccess("admin", `Đã xóa tài khoản [${username}]`);
+          loadAdminData();
+        }
+      }
+
+      function clearAccessLogs() {
+        if (confirm("Xóa toàn bộ lịch sử truy cập của khách?")) {
+          localStorage.removeItem("piko_access_logs");
+          loadAdminData();
+        }
+      }
+
+      function saveAnnouncement() {
+        const text = document
+          .getElementById("admin-announcement-input")
+          .value.trim();
+        if (!text) return alert("Vui lòng nhập nội dung thông báo!");
+
+        localStorage.setItem("piko_global_announcement", text);
+        checkGlobalAnnouncement();
+        alert("Đã phát thông báo toàn hệ thống thành công!");
+      }
+
+      function clearAnnouncement() {
+        localStorage.removeItem("piko_global_announcement");
+        document.getElementById("admin-announcement-input").value = "";
+        checkGlobalAnnouncement();
+        alert("Đã gỡ thông báo!");
+      }
+
+      function checkGlobalAnnouncement() {
+        const notice = localStorage.getItem("piko_global_announcement");
+        const bar = document.getElementById("global-announcement-bar");
+        const textEl = document.getElementById("global-announcement-text");
+
+        if (notice) {
+          textEl.innerText = notice;
+          bar.style.display = "block";
+        } else {
+          bar.style.display = "none";
+        }
+      }
+
+      /* ===================================================
+         5. LOGIC PHÒNG CHAT & TÍNH NĂNG
+      =================================================== */
       function pickCharacter(botId) {
         activeBotId = botId;
         document.querySelectorAll(".char-card").forEach((card) => {
@@ -1012,12 +1491,15 @@
         activeBotId = botId;
         const bot = BOTS[botId];
 
+        const headerImg = document.getElementById("active-bot-img");
         document.getElementById("active-bot-name").innerText = bot.name;
         document.getElementById("active-bot-name").style.color = bot.color;
-        document.getElementById("active-bot-img").src = bot.img;
+        headerImg.src = bot.img;
+        delete headerImg.dataset.processed;
 
         renderBotList();
         loadActiveBotChat();
+        setTimeout(processAllImages, 50);
       }
 
       function getAffinityData() {
@@ -1070,6 +1552,7 @@
             </div>
           `;
         });
+        setTimeout(processAllImages, 50);
       }
 
       function getBotChatHistory(botId) {
@@ -1119,7 +1602,7 @@
         const text = input.value.trim();
         if (!text) return;
 
-        // 1. KIỂM TRA TỪ CẤM NGAY KHI BẤM GỬI
+        // KIỂM TRA TỪ CẤM BẰNG dialogues.js
         if (
           typeof containsBannedWords === "function" &&
           containsBannedWords(text)
@@ -1127,13 +1610,12 @@
           alert(
             "⚠️ CẢNH BÁO VI PHẠM:\n\nTin nhắn chứa từ ngữ bạo lực hoặc độc hại! Vui lòng giữ môi trường trò chuyện văn minh.",
           );
-          input.value = ""; // Xóa từ vi phạm khỏi ô nhập
-          return; // Chặn không gửi vào khung chat
+          input.value = "";
+          return;
         }
 
         const currentBot = activeBotId;
 
-        // 2. NẾU VĂN MINH -> GỬI TIN NHẮN VÀ CỘNG ĐIỂM
         saveBotChatMessage(currentBot, "user", text);
         input.value = "";
         loadActiveBotChat();
@@ -1227,7 +1709,11 @@
       }
 
       function logout() {
+        if (currentUser !== "guest") {
+          logAccess(currentUser, "Đăng xuất khỏi hệ thống");
+        }
         window.speechSynthesis.cancel();
+        currentUser = "guest";
         showScreen("auth-screen");
       }
     </script>
