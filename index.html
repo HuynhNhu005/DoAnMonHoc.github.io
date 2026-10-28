@@ -366,16 +366,22 @@
         transition: width 0.3s;
       }
 
+      /* KHU VỰC CHAT CHÍNH VÀ NỀN CHAT TÙY CHỈNH */
       .chat-main {
         flex: 1;
         display: flex;
         flex-direction: column;
         background: #f8f9fa;
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        transition: background 0.4s ease;
       }
       .chat-header {
         padding: 15px 20px;
-        background: white;
-        border-bottom: 1px solid #eee;
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.08);
         display: flex;
         align-items: center;
         gap: 12px;
@@ -389,12 +395,15 @@
         flex: 1;
         padding: 20px;
         overflow-y: auto;
+        background: rgba(255, 255, 255, 0.25);
+        backdrop-filter: blur(4px);
       }
       .chat-input-area {
         display: flex;
         padding: 15px;
-        background: white;
-        border-top: 1px solid #eee;
+        background: rgba(255, 255, 255, 0.92);
+        backdrop-filter: blur(10px);
+        border-top: 1px solid rgba(0, 0, 0, 0.08);
         gap: 10px;
       }
       .chat-input-area input {
@@ -412,6 +421,39 @@
         border-radius: 25px;
         cursor: pointer;
         font-weight: bold;
+      }
+
+      /* GIAO DIỆN LỰA CHỌN PHÔNG NỀN (BACKGROUND SELECTOR) */
+      .bg-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        margin: 15px 0;
+      }
+      .bg-card {
+        height: 85px;
+        border-radius: 14px;
+        cursor: pointer;
+        border: 3px solid transparent;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+        font-size: 13px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        transition: all 0.25s ease;
+        text-align: center;
+        padding: 5px;
+      }
+      .bg-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.2);
+      }
+      .bg-card.selected {
+        border-color: #6c5ce7;
+        transform: scale(1.05);
       }
 
       /* BẢNG ĐIỀU KHIỂN ADMIN DASHBOARD */
@@ -498,10 +540,11 @@
       .modal-overlay.active {
         display: flex;
       }
-      .history-modal {
+      .history-modal,
+      .bg-modal {
         background: white;
-        width: 600px;
-        max-height: 80vh;
+        width: 620px;
+        max-height: 85vh;
         border-radius: 20px;
         padding: 25px;
         display: flex;
@@ -850,6 +893,14 @@
               margin-top: 15px;
             "
           >
+            <!-- NÚT ĐỔI NỀN CHAT MỚI BỔ SUNG -->
+            <button
+              class="btn-submit"
+              style="background: #a29bfe; color: white"
+              onclick="openBgModal()"
+            >
+              🎨 Đổi Nền Chat
+            </button>
             <button
               class="btn-submit"
               style="background: #0984e3"
@@ -877,7 +928,7 @@
           </div>
         </div>
 
-        <div class="chat-main">
+        <div class="chat-main" id="chat-main">
           <div class="chat-header">
             <img
               id="active-bot-img"
@@ -1110,6 +1161,140 @@
       </div>
     </div>
 
+    <!-- POPUP ĐỔI NỀN CHAT TÙY CHỈNH (MỚI BỔ SUNG) -->
+    <div class="modal-overlay" id="bg-modal">
+      <div class="bg-modal">
+        <div class="history-header">
+          <h3 style="margin: 0; color: #2d3436">
+            🎨 Chọn Phông Nền Khung Chat
+          </h3>
+          <button
+            style="
+              border: none;
+              background: none;
+              font-size: 20px;
+              cursor: pointer;
+            "
+            onclick="closeBgModal()"
+          >
+            ✖
+          </button>
+        </div>
+        <p style="color: #636e72; font-size: 13px; margin-top: 0">
+          Chọn một chủ đề hình nền có sẵn hoặc chèn link hình ảnh tùy thích từ
+          internet:
+        </p>
+
+        <!-- DANH SÁCH THEME MẪU -->
+        <div class="bg-grid">
+          <div
+            class="bg-card"
+            style="background: #f8f9fa; color: #333"
+            onclick="selectPresetBg('#f8f9fa')"
+          >
+            ☁️ Mặc Định (Xám Nhẹ)
+          </div>
+          <div
+            class="bg-card"
+            style="
+              background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+            "
+            onclick="
+              selectPresetBg(
+                'linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%)',
+              )
+            "
+          >
+            🌸 Hồng Sakura
+          </div>
+          <div
+            class="bg-card"
+            style="
+              background: linear-gradient(
+                135deg,
+                #0f2027 0%,
+                #203a43 50%,
+                #2c5364 100%
+              );
+            "
+            onclick="
+              selectPresetBg(
+                'linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%)',
+              )
+            "
+          >
+            🌌 Đêm Vũ Trụ
+          </div>
+          <div
+            class="bg-card"
+            style="
+              background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            "
+            onclick="
+              selectPresetBg(
+                'linear-gradient(135deg, #11998e 0%, #38ef7d 100%)',
+              )
+            "
+          >
+            🌿 Mầm Xanh Mint
+          </div>
+          <div
+            class="bg-card"
+            style="
+              background: linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%);
+            "
+            onclick="
+              selectPresetBg(
+                'linear-gradient(135deg, #ff7e5f 0%, #feb47b 100%)',
+              )
+            "
+          >
+            🌅 Hoàng Hôn Ấm
+          </div>
+          <div
+            class="bg-card"
+            style="
+              background: linear-gradient(135deg, #654ea3 0%, #eaafc8 100%);
+            "
+            onclick="
+              selectPresetBg(
+                'linear-gradient(135deg, #654ea3 0%, #eaafc8 100%)',
+              )
+            "
+          >
+            🔮 Tím Mộng Mơ
+          </div>
+        </div>
+
+        <!-- Ô NHẬP LINK HÌNH ẢNH TÙY CHỈNH -->
+        <div class="input-group" style="margin-top: 10px">
+          <label>Hoặc dán Link URL Hình Ảnh nền tùy thích:</label>
+          <input
+            type="text"
+            id="custom-bg-url"
+            placeholder="Ví dụ: https://images.unsplash.com/photo-1518709268805-4e9042af9f23"
+          />
+        </div>
+
+        <div
+          style="
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 10px;
+          "
+        >
+          <button
+            class="btn-submit"
+            style="background: #6c5ce7"
+            onclick="saveCustomBgUrl()"
+          >
+            💾 Áp Dụng Nền Ảnh
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- NHÚNG FILE TỪ KHÓA & BỘ LỌC TỪ CẤM -->
     <script src="dialogues.js"></script>
 
@@ -1308,6 +1493,11 @@
         } else {
           runningMascots.style.display = "block";
         }
+
+        if (id === "chat-screen") {
+          loadSavedChatBg();
+        }
+
         setTimeout(processAllImages, 50);
       }
 
@@ -1329,7 +1519,6 @@
       }
 
       function loadAdminData() {
-        // 1. Tải Bảng Xếp Hạng (Leaderboard)
         const users = getUsersFromStorage();
         let leaderboard = [];
 
@@ -1351,7 +1540,6 @@
           leaderboard.push({ user: u, exp: totalExp, title: title });
         });
 
-        // Sắp xếp giảm dần theo EXP
         leaderboard.sort((a, b) => b.exp - a.exp);
 
         const lbBody = document.getElementById("leaderboard-table-body");
@@ -1378,7 +1566,6 @@
           `;
         });
 
-        // 2. Tải Danh Sách Account
         const usersBody = document.getElementById("users-table-body");
         usersBody.innerHTML = Object.keys(users).length
           ? ""
@@ -1396,7 +1583,6 @@
           `;
         });
 
-        // 3. Tải Lịch Sử Truy Cập
         const logs = JSON.parse(
           localStorage.getItem("piko_access_logs") || "[]",
         );
@@ -1415,7 +1601,6 @@
           `;
         });
 
-        // 4. Tải Thông Báo
         const currentNotice =
           localStorage.getItem("piko_global_announcement") || "";
         document.getElementById("admin-announcement-input").value =
@@ -1471,7 +1656,7 @@
       }
 
       /* ===================================================
-         5. LOGIC PHÒNG CHAT & TÍNH NĂNG
+         5. LOGIC PHÒNG CHAT & TÍNH NĂNG TÙY CHỈNH PHÔNG NỀN
       =================================================== */
       function pickCharacter(botId) {
         activeBotId = botId;
@@ -1587,12 +1772,51 @@
         chatBox.innerHTML = "";
         history.forEach((item) => {
           if (item.sender === "user") {
-            chatBox.innerHTML += `<div style="margin: 10px 0; text-align: right;"><span style="background: #6c5ce7; color: white; padding: 10px 16px; border-radius: 18px; display: inline-block;">${item.text}</span><div style="font-size:10px; color:#aaa; margin-top:2px;">${item.time}</div></div>`;
+            chatBox.innerHTML += `<div style="margin: 10px 0; text-align: right;"><span style="background: #6c5ce7; color: white; padding: 10px 16px; border-radius: 18px; display: inline-block; box-shadow: 0 4px 12px rgba(108,92,231,0.25);">${item.text}</span><div style="font-size:10px; color:#aaa; margin-top:2px;">${item.time}</div></div>`;
           } else {
-            chatBox.innerHTML += `<div style="margin: 10px 0; text-align: left;"><span style="color: ${bot.color}; font-weight: bold; font-size:12px;">${bot.name}</span><br><span style="background: #ffffff; color: #333; padding: 10px 16px; border-radius: 18px; display: inline-block; margin-top: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">${item.text}</span><div style="font-size:10px; color:#aaa; margin-top:2px;">${item.time}</div></div>`;
+            chatBox.innerHTML += `<div style="margin: 10px 0; text-align: left;"><span style="color: ${bot.color}; font-weight: bold; font-size:12px;">${bot.name}</span><br><span style="background: rgba(255, 255, 255, 0.95); color: #333; padding: 10px 16px; border-radius: 18px; display: inline-block; margin-top: 4px; box-shadow: 0 4px 10px rgba(0,0,0,0.08);">${item.text}</span><div style="font-size:10px; color:#aaa; margin-top:2px;">${item.time}</div></div>`;
           }
         });
         chatBox.scrollTop = chatBox.scrollHeight;
+      }
+
+      /* HÀM ĐỔI NỀN KHUNG CHAT (NỀN GRADIENT HOẶC ẢNH CUSTOM) */
+      function openBgModal() {
+        document.getElementById("bg-modal").classList.add("active");
+      }
+
+      function closeBgModal() {
+        document.getElementById("bg-modal").classList.remove("active");
+      }
+
+      function applyChatBg(bgValue) {
+        const chatMain = document.getElementById("chat-main");
+        if (bgValue.startsWith("url(")) {
+          chatMain.style.background = bgValue;
+          chatMain.style.backgroundSize = "cover";
+          chatMain.style.backgroundPosition = "center";
+        } else {
+          chatMain.style.background = bgValue;
+        }
+        localStorage.setItem(`piko_chat_bg_${currentUser}`, bgValue);
+      }
+
+      function selectPresetBg(bgStyle) {
+        applyChatBg(bgStyle);
+        closeBgModal();
+      }
+
+      function saveCustomBgUrl() {
+        const url = document.getElementById("custom-bg-url").value.trim();
+        if (!url) return alert("Vui lòng nhập Link ảnh hợp lệ!");
+        applyChatBg(`url('${url}')`);
+        closeBgModal();
+      }
+
+      function loadSavedChatBg() {
+        const savedBg =
+          localStorage.getItem(`piko_chat_bg_${currentUser}`) || "#f8f9fa";
+        applyChatBg(savedBg);
       }
 
       /* HÀM GỬI TIN NHẮN: BẬT POPUP CẢNH BÁO VÀ CHẶN TIN NHẮN VI PHẠM */
@@ -1602,7 +1826,6 @@
         const text = input.value.trim();
         if (!text) return;
 
-        // KIỂM TRA TỪ CẤM BẰNG dialogues.js
         if (
           typeof containsBannedWords === "function" &&
           containsBannedWords(text)
@@ -1636,7 +1859,7 @@
         if (!isSpeechEnabled || !("speechSynthesis" in window)) return;
         window.speechSynthesis.cancel();
         const cleanText = text.replace(
-          /[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu,
+          /[\u1F600-\u1F64F\u1F300-\u1F5FF\u1F680-\u1F6FF\u2600-\u26FF\u2700-\u27BF]/g,
           "",
         );
         const utterance = new SpeechSynthesisUtterance(cleanText);
